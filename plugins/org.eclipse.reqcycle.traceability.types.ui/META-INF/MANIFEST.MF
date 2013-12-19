@@ -8,7 +8,8 @@ Bundle-Activator: org.eclipse.reqcycle.traceability.types.ui.configuration.typec
 Bundle-Vendor: %providerName
 Bundle-Localization: plugin
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
-Export-Package: org.eclipse.reqcycle.traceability.types.configuration.typeconfiguration.provider,
+Export-Package: org.eclipse.reqcycle.traceability.types.configuration.preferences.validators,
+ org.eclipse.reqcycle.traceability.types.configuration.typeconfiguration.provider,
  org.eclipse.reqcycle.traceability.types.ui,
  org.eclipse.reqcycle.traceability.types.ui.configuration.typeconfiguration.provider
 Require-Bundle: org.eclipse.core.runtime,
@@ -25,7 +26,13 @@ Require-Bundle: org.eclipse.core.runtime,
  org.eclipse.ziggurat.inject,
  org.eclipse.jface,
  org.eclipse.reqcycle.predicates.ui;bundle-version="1.0.0",
- org.eclipse.reqcycle.uri;bundle-version="1.0.0"
+ org.eclipse.reqcycle.uri;bundle-version="1.0.0",
+ org.eclipse.core.databinding,
+ org.eclipse.core.databinding.beans,
+ org.eclipse.core.databinding.observable,
+ org.eclipse.core.databinding.property,
+ org.eclipse.jface.databinding,
+ com.ibm.icu
 Bundle-ActivationPolicy: lazy
 Import-Package: javax.annotation;version="1.0.0",
  javax.inject;version="1.0.0"

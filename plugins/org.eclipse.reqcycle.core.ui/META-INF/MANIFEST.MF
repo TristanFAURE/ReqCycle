@@ -5,6 +5,14 @@ Bundle-SymbolicName: org.eclipse.reqcycle.core.ui;singleton:=true
 Bundle-Version: 1.0.0.qualifier
 Bundle-Activator: org.eclipse.reqcycle.core.ui.Activator
 Require-Bundle: org.eclipse.ui,
- org.eclipse.core.runtime
+ org.eclipse.core.runtime,
+ org.eclipse.emf.common,
+ org.eclipse.emf.common.ui,
+ org.eclipse.reqcycle.core,
+ org.eclipse.core.filesystem,
+ org.eclipse.ziggurat.configuration,
+ org.eclipse.ziggurat.inject,
+ javax.inject,
+ org.eclipse.e4.core.services
 Bundle-ActivationPolicy: lazy
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6

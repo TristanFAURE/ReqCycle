@@ -24,7 +24,7 @@ public class ReqCyclePerspective implements IPerspectiveFactory {
 		addPerspectiveShortcuts(layout);
 		{
 			IFolderLayout folderLayout = layout.createFolder("folder", IPageLayout.LEFT, 0.25f, IPageLayout.ID_EDITOR_AREA);
-			addView("org.eclipse.jdt.ui.PackageExplorer", folderLayout);
+			addView("org.eclipse.ui.navigator.ProjectExplorer", folderLayout);
 			addView("org.eclipse.reqcycle.repository.ui.views.requirements", folderLayout);
 		}
 		{

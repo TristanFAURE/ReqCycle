@@ -22,19 +22,19 @@ import javax.inject.Inject;
 
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.window.Window;
-import org.eclipse.reqcycle.repository.data.IRequirementSourceManager;
+import org.eclipse.reqcycle.repository.data.IDataManager;
 import org.eclipse.reqcycle.ui.components.dialogs.CheckBoxInputDialog;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Listener;
 
-import DataModel.RequirementSource;
+import RequirementSourceConf.RequirementSource;
 
 public class SelectRequirementSourcesAction extends Action {
 
 	/** Requirement Source Manager */
 	@Inject
-	IRequirementSourceManager requirementSourceManager;
+	IDataManager requirementSourceManager;
 
 	protected Collection<RequirementSource> sources;
 
@@ -58,7 +58,7 @@ public class SelectRequirementSourcesAction extends Action {
 	}
 
 	protected Collection<RequirementSource> openRequirementSourceChooser(Collection<RequirementSource> initialSelection) {
-		Set<RequirementSource> repositories = requirementSourceManager.getRepositories();
+		Set<RequirementSource> repositories = requirementSourceManager.getRequirementSources();
 
 		@SuppressWarnings({ "rawtypes", "unchecked" })
 		CheckBoxInputDialog dialog = new CheckBoxInputDialog(Display.getDefault().getActiveShell(), "Requirement filtering", "Select Requirement Sources to filter", repositories, null, (Collection)initialSelection);

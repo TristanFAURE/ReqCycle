@@ -12,7 +12,6 @@ import org.eclipse.emf.common.util.EList;
 import org.eclipse.emf.common.util.URI;
 import org.eclipse.emf.ecore.EClass;
 import org.eclipse.emf.ecore.EClassifier;
-import org.eclipse.emf.ecore.EDataType;
 import org.eclipse.emf.ecore.EObject;
 import org.eclipse.emf.ecore.EPackage;
 import org.eclipse.emf.ecore.EReference;
@@ -23,16 +22,18 @@ import org.eclipse.emf.ecore.resource.ResourceSet;
 import org.eclipse.emf.edit.provider.ComposedAdapterFactory;
 import org.eclipse.emf.edit.provider.IItemLabelProvider;
 import org.eclipse.jface.viewers.LabelProvider;
-import org.eclipse.reqcycle.repository.data.IRequirementSourceManager;
+import org.eclipse.reqcycle.core.ILogger;
+import org.eclipse.reqcycle.repository.data.IDataManager;
+import org.eclipse.reqcycle.repository.data.types.IAttributeType;
+import org.eclipse.reqcycle.repository.data.types.internal.AttributeTypeImpl;
 import org.eclipse.swt.graphics.Image;
-import org.eclipse.ziggurat.inject.ZigguratInject;
 
-import DataModel.Contained;
-import DataModel.RequirementSource;
-import DataModel.Scope;
-import DataModel.Section;
-import MappingModel.AttributeMapping;
-import MappingModel.ElementMapping;
+import MappingModel.MappingAttribute;
+import MappingModel.MappingElement;
+import RequirementSourceConf.RequirementSource;
+import RequirementSourceData.AbstractElement;
+import RequirementSourceData.Section;
+import ScopeConf.Scope;
 
 import com.google.common.base.Predicate;
 import com.google.common.collect.Collections2;
@@ -40,21 +41,35 @@ import com.google.common.collect.Collections2;
 public class DataUtil {
 
 	/** Requirement Source Manager */
-	private @Inject
-	static IRequirementSourceManager requirementSourceManager = ZigguratInject.make(IRequirementSourceManager.class);
-	
-	public static final Collection<EDataType> eDataTypes = 
-		Arrays.asList(EcorePackage.Literals.EBYTE, 
-			EcorePackage.Literals.ESTRING, 
-			EcorePackage.Literals.EINT, 
-			EcorePackage.Literals.ELONG,
-			EcorePackage.Literals.EBIG_DECIMAL, 
-			EcorePackage.Literals.ECHAR, 
-			EcorePackage.Literals.EFLOAT, 
-			EcorePackage.Literals.EDOUBLE,
-			EcorePackage.Literals.ESHORT,
-			EcorePackage.Literals.EBIG_INTEGER,
-			EcorePackage.Literals.EBOOLEAN);
+	@Inject
+	static IDataManager requirementSourceManager;
+
+	@Inject
+	static ILogger logger;
+
+	public static final IAttributeType BYTE = new AttributeTypeImpl(EcorePackage.Literals.EBYTE.getName().replaceFirst("E", ""), EcorePackage.Literals.EBYTE);
+
+	public static final IAttributeType STRING = new AttributeTypeImpl(EcorePackage.Literals.ESTRING.getName().replaceFirst("E", ""), EcorePackage.Literals.ESTRING);
+
+	public static final IAttributeType INT = new AttributeTypeImpl(EcorePackage.Literals.EINT.getName().replaceFirst("E", ""), EcorePackage.Literals.EINT);
+
+	public static final IAttributeType LONG = new AttributeTypeImpl(EcorePackage.Literals.ELONG.getName().replaceFirst("E", ""), EcorePackage.Literals.ELONG);
+
+	public static final IAttributeType BIG_DECIMAL = new AttributeTypeImpl(EcorePackage.Literals.ELONG.getName().replaceFirst("E", ""), EcorePackage.Literals.ELONG);
+
+	public static final IAttributeType CHAR = new AttributeTypeImpl(EcorePackage.Literals.ECHAR.getName().replaceFirst("E", ""), EcorePackage.Literals.ECHAR);
+
+	public static final IAttributeType FLOAT = new AttributeTypeImpl(EcorePackage.Literals.EFLOAT.getName().replaceFirst("E", ""), EcorePackage.Literals.EFLOAT);
+
+	public static final IAttributeType DOUBLE = new AttributeTypeImpl(EcorePackage.Literals.EDOUBLE.getName().replaceFirst("E", ""), EcorePackage.Literals.EDOUBLE);
+
+	public static final IAttributeType SHORT = new AttributeTypeImpl(EcorePackage.Literals.ESHORT.getName().replaceFirst("E", ""), EcorePackage.Literals.ESHORT);
+
+	public static final IAttributeType BIG_INTEGER = new AttributeTypeImpl(EcorePackage.Literals.EBIG_INTEGER.getName().replaceFirst("E", ""), EcorePackage.Literals.EBIG_INTEGER);
+
+	public static final IAttributeType BOOLEAN = new AttributeTypeImpl(EcorePackage.Literals.EBOOLEAN.getName().replaceFirst("E", ""), EcorePackage.Literals.EBOOLEAN);
+
+	public static final Collection<IAttributeType> eDataTypes = Arrays.asList(BYTE, STRING, INT, LONG, BIG_DECIMAL, CHAR, FLOAT, DOUBLE, SHORT, BIG_INTEGER, BOOLEAN);
 
 	protected static ComposedAdapterFactory cAdapterFactory = new ComposedAdapterFactory(ComposedAdapterFactory.Descriptor.Registry.INSTANCE);
 
@@ -68,7 +83,7 @@ public class DataUtil {
 		}
 		return obj.toString();
 	}
-	
+
 	public static Image getImage(Object obj) {
 		IItemLabelProvider itemLabelProvider = (IItemLabelProvider)cAdapterFactory.adapt(obj, IItemLabelProvider.class);
 		if(itemLabelProvider != null) {
@@ -77,29 +92,33 @@ public class DataUtil {
 		return null;
 	}
 
-	public static LabelProvider labelProvider = new LabelProvider(){
+	public static LabelProvider labelProvider = new LabelProvider() {
+
+		@Override
 		public String getText(Object element) {
 			return getLabel(element);
 		};
-		
+
+		@Override
 		public Image getImage(Object element) {
 			return DataUtil.getImage(element);
 		};
-		
+
 	};
-	
-	public static String getInformation(Contained object){
+
+
+	public static String getInformation(AbstractElement object) {
 		String result = "";
-		
+
 		EList<EStructuralFeature> structuralFeatures = object.eClass().getEStructuralFeatures();
 		if(object.getId() != null && !object.getId().isEmpty()) {
 			result += " id : " + object.getId() + " ";
 		}
-		if(object.getName() != null && !object.getName().isEmpty()) {
+		if(object.getText() != null && !object.getText().isEmpty()) {
 			if(!result.isEmpty()) {
 				result += " | ";
 			}
-			result += " name : " + object.getName() + " ";
+			result += " name : " + object.getText() + " ";
 		}
 
 		for(EStructuralFeature eStructuralFeature : structuralFeatures) {
@@ -107,24 +126,24 @@ public class DataUtil {
 				result += "[ " + eStructuralFeature.getName() + " : " + object.eGet(eStructuralFeature) + "]";
 			}
 		}
-		if (result.isEmpty()) {
-			result = "Requirement Type : " + object.eClass().getName() +" [ this element doesn't have any attribute ]"; 
+		if(result.isEmpty()) {
+			result = "Requirement Type : " + object.eClass().getName() + " [ this element doesn't have any attribute ]";
 		}
-		
+
 		return result;
 	}
-	
+
 	/**
-	 * Retrieves attribute mapping by his ID from an element mapping
+	 * Retrieves attribute mapping by his ID from an element mapping.
 	 * 
-	 * @param elementMapping
-	 *        the element mapping
+	 * @param mappingElement
+	 *        the mapping element
 	 * @param id
 	 *        the attribute mapping ID
 	 * @return the attribute mapping found or null
 	 */
-	public static AttributeMapping getAttributeMapping(ElementMapping elementMapping, String id) {
-		for(AttributeMapping attribute : elementMapping.getAttributes()) {
+	public static MappingAttribute getAttributeMapping(MappingElement mappingElement, String id) {
+		for(MappingAttribute attribute : mappingElement.getAttributes()) {
 			if(id.equals(attribute.getSourceId())) {
 				return attribute;
 			}
@@ -133,7 +152,7 @@ public class DataUtil {
 	}
 
 	/**
-	 * Retrieves element mapping from a mapping by his qualifier
+	 * Retrieves element mapping from a mapping by his qualifier.
 	 * 
 	 * @param mapping
 	 *        the mapping
@@ -141,21 +160,21 @@ public class DataUtil {
 	 *        the source element qualifier
 	 * @return the element mapping found or null
 	 */
-	public static ElementMapping getElementMapping(Collection<ElementMapping> mapping, String qualifier) {
-		for(ElementMapping elementMapping : mapping) {
-			if(qualifier.equals(elementMapping.getSourceQualifier())) {
-				return elementMapping;
+	public static MappingElement getElementMapping(Collection<MappingElement> mapping, String qualifier) {
+		for(MappingElement mappingElement : mapping) {
+			if(qualifier.equals(mappingElement.getSourceQualifier())) {
+				return mappingElement;
 			}
 		}
 		return null;
 	}
 
-	public static Collection<Contained> getAllContainedElements(EList<Contained> containedElements) {
-		Collection<Contained> result = new ArrayList<Contained>();
-		result.addAll(containedElements);
-		for(Contained contained : containedElements) {
-			if(contained instanceof Section) {
-				result.addAll(getAllContainedElements(((Section)contained).getChildren()));
+	public static Collection<AbstractElement> getAllContainedElements(EList<AbstractElement> elements) {
+		Collection<AbstractElement> result = new ArrayList<AbstractElement>();
+		result.addAll(elements);
+		for(AbstractElement element : elements) {
+			if(element instanceof Section) {
+				result.addAll(getAllContainedElements(((Section)element).getChildren()));
 			}
 		}
 		return result;
@@ -167,7 +186,7 @@ public class DataUtil {
 	 * @return
 	 */
 	public static Collection<EClassifier> getTargetEPackage(ResourceSet resourceSet, String modelLocation) {
-		//TODO : check uri creation
+		//FIXME : check uri creation
 		URI uriAttributeModel = URI.createPlatformPluginURI(modelLocation, false);
 		Resource attributeModelResource = resourceSet.getResource(uriAttributeModel, true);
 		EList<EObject> modelContent = attributeModelResource.getContents();
@@ -175,15 +194,16 @@ public class DataUtil {
 			Collection<EClassifier> result = new ArrayList<EClassifier>();
 			Iterator<EObject> iter = modelContent.iterator();
 			while(iter.hasNext()) {
-				EObject eObject = (EObject)iter.next();
+				EObject eObject = iter.next();
 				if(eObject instanceof EPackage) {
 					Collection<EClassifier> filtered = Collections2.filter(((EPackage)eObject).getEClassifiers(), new Predicate<EClassifier>() {
+
 						@Override
 						public boolean apply(EClassifier arg0) {
 							if(arg0 instanceof EClass) {
 								EList<EClass> superTypes = ((EClass)arg0).getEAllSuperTypes();
 								for(EClassifier superType : superTypes) {
-									if("Contained".equals(superType.getName())) {
+									if("AbstractElement".equals(superType.getName())) {
 										return true;
 									}
 								}
@@ -198,15 +218,15 @@ public class DataUtil {
 		}
 		return null;
 	}
-	
+
 	public static Collection<RequirementSource> getRepositories(Object obj) {
-		if(obj instanceof String && requirementSourceManager.getRepositories((String)obj) != null) {
-			return requirementSourceManager.getRepositories((String)obj);
+		if(obj instanceof String && requirementSourceManager.getRequirementSources((String)obj) != null) {
+			return requirementSourceManager.getRequirementSources((String)obj);
 		}
 		if(obj instanceof RequirementSource) {
 			return Arrays.asList(((RequirementSource)obj));
 		}
 		return Collections.emptyList();
 	}
-	
+
 }

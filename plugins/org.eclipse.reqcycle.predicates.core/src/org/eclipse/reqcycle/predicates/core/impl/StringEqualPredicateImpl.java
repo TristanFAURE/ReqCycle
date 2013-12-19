@@ -65,10 +65,10 @@ public class StringEqualPredicateImpl extends EqualPredicateImpl<String> impleme
 	@Override
 	public boolean match(Object input) {
 		Object val = this.getInputValueFromEObject(input);
-		if (!(val instanceof String) && val != null) {
+		if(!(val instanceof String) && val != null) {
 			val = val.toString();
 		}
-		return input != null && input.equals(val);
+		return expectedObject != null && expectedObject.equals(val);
 	}
 
 } //StringEqualPredicateImpl

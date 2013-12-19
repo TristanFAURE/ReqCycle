@@ -19,8 +19,8 @@ import org.eclipse.emf.ecore.EStructuralFeature;
 import org.eclipse.jface.viewers.LabelProvider;
 import org.eclipse.swt.graphics.Image;
 
-import DataModel.Contained;
-import DataModel.RequirementSource;
+import RequirementSourceConf.RequirementSource;
+import RequirementSourceData.AbstractElement;
 
 public class RequirementLabelProvider extends LabelProvider {
 
@@ -34,16 +34,16 @@ public class RequirementLabelProvider extends LabelProvider {
 	public String getText(Object element) {
 
 		if(element instanceof RequirementSource) {
-			return ((RequirementSource)element).getRepositoryLabel() + " (" + ((RequirementSource)element).getRepositoryUri() + " )";
+			return ((RequirementSource)element).getName() + " (" + ((RequirementSource)element).getRepositoryUri() + " )";
 		}
 
-		if(element instanceof Contained) {
-			String name = ((Contained)element).getName();
-			EList<EStructuralFeature> structuralFeatures = ((Contained)element).eClass().getEStructuralFeatures();
-			String attr = " [ id : " + ((Contained)element).getId() + " ]" + "[ name : " + ((Contained)element).getName() + " ]";
+		if(element instanceof AbstractElement) {
+			String name = ((AbstractElement)element).getText();
+			EList<EStructuralFeature> structuralFeatures = ((AbstractElement)element).eClass().getEStructuralFeatures();
+			String attr = " [ id : " + ((AbstractElement)element).getId() + " ]" + "[ text : " + ((AbstractElement)element).getText() + " ]";
 
 			for(EStructuralFeature eStructuralFeature : structuralFeatures) {
-				attr += "[ " + eStructuralFeature.getName() + " : " + ((Contained)element).eGet(eStructuralFeature) + "]";
+				attr += "[ " + eStructuralFeature.getName() + " : " + ((AbstractElement)element).eGet(eStructuralFeature) + "]";
 			}
 			return name + attr;
 		}

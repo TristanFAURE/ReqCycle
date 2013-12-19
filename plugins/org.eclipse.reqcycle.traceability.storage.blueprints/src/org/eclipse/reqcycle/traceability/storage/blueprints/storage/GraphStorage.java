@@ -17,7 +17,7 @@ import org.eclipse.reqcycle.traceability.model.TType;
 import org.eclipse.reqcycle.traceability.storage.IStorageProvider;
 import org.eclipse.reqcycle.traceability.storage.ITraceabilityStorage;
 import org.eclipse.reqcycle.traceability.storage.ITraceabilityStorageTopics;
-import org.eclipse.reqcycle.traceability.storage.blueprints.graph.ISpecificGraphProvider;
+import org.eclipse.reqcycle.traceability.storage.blueprints.graph.IBusinessOperationProvider;
 import org.eclipse.reqcycle.uri.IReachableCreator;
 import org.eclipse.reqcycle.uri.model.Reachable;
 import org.eclipse.ziggurat.inject.ZigguratInject;
@@ -38,7 +38,7 @@ public class GraphStorage implements ITraceabilityStorage {
 
 	private Graph graph;
 
-	private ISpecificGraphProvider.IBusinessOperations graphUtils;
+	private IBusinessOperationProvider.IBusinessOperations graphUtils;
 	private String path;
 
 	public GraphStorage(Graph graph, String path) {
@@ -46,7 +46,7 @@ public class GraphStorage implements ITraceabilityStorage {
 	}
 
 	public GraphStorage(Graph graph, String path,
-			ISpecificGraphProvider.IBusinessOperations operations) {
+			IBusinessOperationProvider.IBusinessOperations operations) {
 		this.graph = graph;
 		this.path = path;
 		if (operations == null) {

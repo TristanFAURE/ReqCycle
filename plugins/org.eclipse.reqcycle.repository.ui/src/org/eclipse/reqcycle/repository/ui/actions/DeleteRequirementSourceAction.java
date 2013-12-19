@@ -16,13 +16,15 @@ package org.eclipse.reqcycle.repository.ui.actions;
 import javax.inject.Inject;
 
 import org.eclipse.jface.action.Action;
+import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.reqcycle.repository.connector.IConnectorManager;
-import org.eclipse.reqcycle.repository.data.IRequirementSourceManager;
+import org.eclipse.reqcycle.repository.data.IDataManager;
+import org.eclipse.swt.widgets.Display;
 
-import DataModel.RequirementSource;
+import RequirementSourceConf.RequirementSource;
 
 /**
  * Action to delete a requirement source
@@ -34,7 +36,7 @@ public class DeleteRequirementSourceAction extends Action {
 
 	/** Requirement Source Manager */
 	@Inject
-	IRequirementSourceManager requirementSourceManager;
+	IDataManager requirementSourceManager;
 
 	@Inject
 	IConnectorManager connectorManager;
@@ -57,9 +59,10 @@ public class DeleteRequirementSourceAction extends Action {
 			Object obj = ((IStructuredSelection)selection).getFirstElement();
 
 			if(obj instanceof RequirementSource) {
-				requirementSourceManager.removeRequirementSource((RequirementSource)obj);
+				boolean response = MessageDialog.openQuestion(Display.getDefault().getActiveShell(), "Remove Requirement Source", "Would you like to remove Requirement Source file ?");
+				requirementSourceManager.removeRequirementSource((RequirementSource)obj, response);
 			} else if(obj instanceof String && connectorManager.get((String)obj) != null) {
-				requirementSourceManager.removeConnectorRepositories((String)obj);
+				requirementSourceManager.removeRequirementSources((String)obj);
 			}
 
 			viewer.refresh();

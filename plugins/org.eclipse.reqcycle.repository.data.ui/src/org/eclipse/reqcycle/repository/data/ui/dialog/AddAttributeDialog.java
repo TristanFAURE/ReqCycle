@@ -10,7 +10,7 @@
  * Contributors:
  *  Anass RADOUANI (AtoS) anass.radouani@atos.net - Initial API and implementation
  *
-  *****************************************************************************/
+ *****************************************************************************/
 package org.eclipse.reqcycle.repository.data.ui.dialog;
 
 import java.util.Collection;
@@ -18,12 +18,11 @@ import java.util.Collection;
 import org.eclipse.core.databinding.DataBindingContext;
 import org.eclipse.core.databinding.beans.PojoProperties;
 import org.eclipse.core.databinding.observable.value.IObservableValue;
-import org.eclipse.emf.ecore.EDataType;
-import org.eclipse.emf.ecore.EcoreFactory;
 import org.eclipse.jface.databinding.viewers.ViewerProperties;
 import org.eclipse.jface.viewers.ArrayContentProvider;
 import org.eclipse.jface.viewers.ComboViewer;
 import org.eclipse.jface.viewers.LabelProvider;
+import org.eclipse.reqcycle.repository.data.types.IAttributeType;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Button;
@@ -34,66 +33,68 @@ import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Shell;
 
 public class AddAttributeDialog extends NameDialog {
-	
+
 	/**
 	 * The popup bean
 	 */
 	public class Bean extends NameBean {
-		
-		private EDataType type;
+
+		private IAttributeType type;
 
 		public Bean(Listener listener) {
 			super(listener);
 		}
-		
-		public EDataType getType() {
+
+		public IAttributeType getType() {
 			return type;
 		}
 
-		public void setType(EDataType type) {
+		public void setType(IAttributeType type) {
 			this.type = type;
 			listener.handleEvent(new Event());
 		}
 	}
-	
+
 	/** Attribute types */
-	private Collection<EDataType> dataTypes;
-	
+	private Collection<IAttributeType> types;
+
 	/** Attribute Types Combo Viewer */
 	private ComboViewer cvAttribute;
 
-	public AddAttributeDialog(Shell parentShell, String title, Collection<EDataType> dataTypes) {
+	public AddAttributeDialog(Shell parentShell, String title, Collection<IAttributeType> types) {
 		super(parentShell, title);
 		setBean(new Bean(this));
-		this.dataTypes = dataTypes;
+		this.types = types;
 	}
 
 	@Override
 	protected void doCreateDialogArea(Composite parent) {
-			Label typelbl = new Label(parent, SWT.None);
-			typelbl.setText("Type :");
-			typelbl.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false));
-			
-			cvAttribute = new ComboViewer(parent);
-			cvAttribute.getCombo().setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false));
-			cvAttribute.setLabelProvider(new LabelProvider(){
-				@Override
-				public String getText(Object element) {
-					if(element instanceof EDataType) {
-						String name = ((EDataType)element).getName();
-						String nsURI = ((EDataType)element).getEPackage().getNsURI();
-						if(EcoreFactory.eINSTANCE.getEPackage().getNsURI().equals(nsURI) && name.startsWith("E")) {
-							name = name.replaceFirst("E", "");
-						}
-						return name + "  [" + nsURI + "]";
-					}
-					return super.getText(element);
+		Label typelbl = new Label(parent, SWT.None);
+		typelbl.setText("Type :");
+		typelbl.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false));
+
+		cvAttribute = new ComboViewer(parent);
+		cvAttribute.getCombo().setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false));
+		cvAttribute.setLabelProvider(new LabelProvider() {
+
+			@Override
+			public String getText(Object element) {
+				if(element instanceof IAttributeType) {
+
+					return ((IAttributeType)element).getName();
+					//						String nsURI = ((IAttributeType)element).getEPackage().getNsURI();
+					//						if(EcoreFactory.eINSTANCE.getEPackage().getNsURI().equals(nsURI) && name.startsWith("E")) {
+					//							name = name.replaceFirst("E", "");
+					//						}
+					//						return name + "  [" + nsURI + "]";
 				}
-			});
-			cvAttribute.setContentProvider(ArrayContentProvider.getInstance());
-			cvAttribute.setInput(dataTypes);
+				return super.getText(element);
+			}
+		});
+		cvAttribute.setContentProvider(ArrayContentProvider.getInstance());
+		cvAttribute.setInput(types);
 	};
-	
+
 	@Override
 	protected Button createButton(Composite parent, int id, String label, boolean defaultButton) {
 		Button button = super.createButton(parent, id, label, defaultButton);
@@ -102,7 +103,7 @@ public class AddAttributeDialog extends NameDialog {
 		}
 		return button;
 	}
-	
+
 	@Override
 	public String getName() {
 		return bean.getName();
@@ -115,7 +116,7 @@ public class AddAttributeDialog extends NameDialog {
 		}
 		return true;
 	}
-	
+
 	@Override
 	protected void doInitDataBindings(DataBindingContext bindingContext) {
 		IObservableValue observeSingleSelectionAttrCV = ViewerProperties.singleSelection().observe(cvAttribute);
@@ -126,7 +127,7 @@ public class AddAttributeDialog extends NameDialog {
 	/**
 	 * @return chosen attribue type
 	 */
-	public EDataType getType() {
+	public IAttributeType getType() {
 		return ((Bean)bean).getType();
 	}
 }

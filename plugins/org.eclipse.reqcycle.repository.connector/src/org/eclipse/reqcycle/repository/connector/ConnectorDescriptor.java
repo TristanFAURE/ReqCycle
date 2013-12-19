@@ -51,11 +51,12 @@ public class ConnectorDescriptor {
 
 	/**
 	 * Creates a new instance of the connector.
+	 * 
 	 * @return
-	 * @throws CoreException 
+	 * @throws CoreException
 	 */
-	public IConnector createConnector() throws CoreException{
-		IConnector connector = (IConnector) connectorConfElement.createExecutableExtension("class");//$NON-NLS-1$
+	public IConnector createConnector() throws CoreException {
+		IConnector connector = (IConnector)connectorConfElement.createExecutableExtension("class");//$NON-NLS-1$
 		ZigguratInject.inject(connector);
 		return connector;
 	}
@@ -77,7 +78,7 @@ public class ConnectorDescriptor {
 	public String getId() {
 		return id;
 	}
-	
+
 	/**
 	 * Gets the image descriptor of the connector.
 	 * 

@@ -30,7 +30,7 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Shell;
 
-import MappingModel.AttributeMapping;
+import MappingModel.MappingAttribute;
 
 
 public abstract class MappingDialogPage extends Dialog {
@@ -55,9 +55,10 @@ public abstract class MappingDialogPage extends Dialog {
 
 	public Control build(Composite parent) {
 		mappingComposite = new MappingComposite(parent, SWT.NONE, null) {
+
 			@Override
 			public EObject linkElements(Object sourceSelection, Object targetSelection) {
-				return MappingDialogPage.this.linkElements(sourceSelection,targetSelection);
+				return MappingDialogPage.this.linkElements(sourceSelection, targetSelection);
 			}
 
 			@Override
@@ -120,10 +121,10 @@ public abstract class MappingDialogPage extends Dialog {
 
 	protected abstract IContentProvider getSourceContentProvider();
 
-	protected abstract AttributeMapping linkElements(Object sourceSelection, Object targetSelection);
+	protected abstract MappingAttribute linkElements(Object sourceSelection, Object targetSelection);
 
 	public abstract ILabelProvider getSourceLabelProvider();
-	
+
 	public Collection<EObject> getResult() {
 		if(mappingComposite != null) {
 			return mappingComposite.getResult();

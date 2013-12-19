@@ -51,6 +51,7 @@ import com.google.common.collect.Maps;
 @SuppressWarnings({ "rawtypes", "unchecked" })
 public class ConfigurationManagerImpl implements IConfigurationManager {
 
+	
 	protected static final Map<?, ?> SAVE_OPTIONS = Collections.singletonMap(XMIResource.OPTION_SCHEMA_LOCATION, true);
 
 	public static final String CONF_RESOURCE_EXTENSION = "emfconf";
@@ -59,6 +60,10 @@ public class ConfigurationManagerImpl implements IConfigurationManager {
 
 
 	public void saveConfiguration(EObject conf, IResource context, Scope scope, String id, ResourceSet resourceSet) throws IOException {
+		saveConfiguration(Collections.singleton(conf), context, scope, id, resourceSet);
+	}
+	
+	public void saveConfiguration(Collection<? extends EObject> conf, IResource context, Scope scope, String id, ResourceSet resourceSet) throws IOException {
 		if(context == null && Scope.PROJECT.equals(scope)) {
 			throw new IOException("Context should not be null when using project scope");
 		}
@@ -77,7 +82,7 @@ public class ConfigurationManagerImpl implements IConfigurationManager {
 		}
 
 		r.getContents().clear();
-		r.getContents().add(conf);
+		r.getContents().addAll(conf);
 
 		if(r instanceof EMFConfResource) {
 			((EMFConfResource)r).manualSave(SAVE_OPTIONS);
@@ -85,8 +90,8 @@ public class ConfigurationManagerImpl implements IConfigurationManager {
 			r.save(SAVE_OPTIONS);
 		}
 	}
-
-	public EObject getConfiguration(IResource context, Scope scope, String id, ResourceSet resourceSet, boolean reload) {
+	
+	public Collection<EObject> getConfiguration(IResource context, Scope scope, String id, ResourceSet resourceSet, boolean reload) {
 		URI confFileUri = getConfigurationFileUri(context, scope, id);
 		if(resourceSet instanceof RestrictedResourceSet) {
 			((RestrictedResourceSet)resourceSet).addAuthorizedUri(confFileUri);
@@ -101,7 +106,7 @@ public class ConfigurationManagerImpl implements IConfigurationManager {
 			Resource r = resourceSet.getResource(confFileUri, true);
 
 			if(r != null && !r.getContents().isEmpty()) {
-				return r.getContents().get(0);
+				return r.getContents();
 			}
 		} catch (Throwable e) {
 			//DO NOTHING
@@ -119,7 +124,7 @@ public class ConfigurationManagerImpl implements IConfigurationManager {
 		saveConfiguration(conf, context, scope, id, rs);
 	}
 
-	public EObject getConfiguration(IResource context, Scope scope, String id, boolean reload) {
+	public Collection<EObject> getConfiguration(IResource context, Scope scope, String id, boolean reload) {
 		return getConfiguration(context, scope, id, rs, reload);
 	}
 
@@ -161,7 +166,7 @@ public class ConfigurationManagerImpl implements IConfigurationManager {
 		return false;
 	}
 
-	protected URI getConfigurationFileUri(IResource context, Scope scope, String id) {
+	public URI getConfigurationFileUri(IResource context, Scope scope, String id) {
 		return getConfigurationFileUri(context, scope, id, CONF_RESOURCE_EXTENSION);
 	}
 
@@ -178,14 +183,11 @@ public class ConfigurationManagerImpl implements IConfigurationManager {
 		}
 
 		if(confFilePath == null && (scope == null || Scope.WORKSPACE.equals(scope))) {
-			confFilePath = Activator.getDefault().getStateLocation().append("/" + id + "." + extension);
-		}
-
-		if(confFilePath.getDevice() == null) {
-			return URI.createPlatformResourceURI(confFilePath.toOSString(), true);
+			return URI.createURI("platform:/meta/" + Activator.PLUGIN_ID + "/" + id + "." + extension);
 		} else {
-			return URI.createFileURI(confFilePath.toOSString());
+			return URI.createPlatformResourceURI(confFilePath.toOSString(), true);
 		}
+		
 	}
 
 	public String getConfigurationResourceExtension() {
@@ -193,7 +195,12 @@ public class ConfigurationManagerImpl implements IConfigurationManager {
 	}
 
 	public Map<String, Object> getSimpleConfiguration(IResource context, Scope scope, String id, boolean reload) {
-		EObject confEObj = getConfiguration(context, scope, id, reload);
+		EObject confEObj = null;
+		
+		Collection<EObject> conf = getConfiguration(context, scope, id, reload);
+		if(conf != null && !conf.isEmpty()) {
+			confEObj = conf.iterator().next();
+		}
 
 		if(confEObj == null) {
 			return null;

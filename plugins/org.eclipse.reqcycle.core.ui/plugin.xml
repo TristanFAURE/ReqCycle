@@ -18,6 +18,16 @@
                id="org.eclipse.reqcycle.core.ui.menu"
                label="ReqCycle"
                mnemonic="M">
+          <command
+                commandId="org.eclipse.reqcycle.core.ui.command.exportConf"
+                label="Export Configuration"
+                style="push">
+          </command>
+          <command
+                commandId="org.eclipse.reqcycle.core.ui.command.initConf"
+                label="Initialize Configuration"
+                style="push">
+          </command>
       	</menu>
     </menuContribution>
 	<menuContribution
@@ -42,6 +52,27 @@
             id="org.eclipse.reqcycle.core.ui.category"
             name="ReqCycle Category">
       </category>
+      <command
+            categoryId="org.eclipse.reqcycle.core.ui.category"
+            id="org.eclipse.reqcycle.core.ui.command.exportConf"
+            name="Export Configuration">
+      </command>
+      <command
+            categoryId="org.eclipse.reqcycle.core.ui.category"
+            id="org.eclipse.reqcycle.core.ui.command.initConf"
+            name="Initialize configuration">
+      </command>
+   </extension>
+   <extension
+         point="org.eclipse.ui.handlers">
+      <handler
+            class="org.eclipse.reqcycle.core.ui.ExportConfigurationHandler"
+            commandId="org.eclipse.reqcycle.core.ui.command.exportConf">
+      </handler>
+      <handler
+            class="org.eclipse.reqcycle.core.ui.InitializeConfigurationHandler"
+            commandId="org.eclipse.reqcycle.core.ui.command.initConf">
+      </handler>
    </extension>
     
 </plugin>

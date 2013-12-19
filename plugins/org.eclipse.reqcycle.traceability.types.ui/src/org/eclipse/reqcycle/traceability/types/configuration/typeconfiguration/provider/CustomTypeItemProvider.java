@@ -5,6 +5,7 @@ package org.eclipse.reqcycle.traceability.types.configuration.typeconfiguration.
 import java.util.Collection;
 import java.util.List;
 
+import org.eclipse.core.runtime.Platform;
 import org.eclipse.emf.common.notify.AdapterFactory;
 import org.eclipse.emf.common.notify.Notification;
 import org.eclipse.emf.ecore.EStructuralFeature;
@@ -126,21 +127,48 @@ public class CustomTypeItemProvider extends TypeItemProvider implements
 	@Override
 	public String getText(Object object) {
 		CustomType customType = (CustomType) object;
+		
 		StringBuilder label = new StringBuilder(customType.getTypeId());
 		if (customType.getEntries().size() > 0) {
-			label.append(" [");
+ 			label.append(" [");
 			boolean flag = false;
 			for (Entry e : customType.getEntries()) {
 				if (flag) {
 					label.append(", ");
 				}
-				label.append(e.getName()).append("=").append(e.getValue());
+				
+				String t = null;
+				Object v = e.getValue();
+				if(v instanceof String) {
+					 t = (String)v;
+				} else if (Platform.getAdapterManager().hasAdapter(v, String.class.getName())) {
+					Object adapter = Platform.getAdapterManager().getAdapter(v, String.class);
+					if(adapter instanceof String) {
+						t = (String)adapter;
+					}
+				}
+				
+				
+				label.append(e.getName()).append("=").append(t);
 				flag = true;
 			}
 			label.append("]");
 		}
 		return label.toString();
 	}
+	
+//	protected Method getGetLabelMethod (Object o){
+//		return Iterables.find(ImmutableList.copyOf(o.getClass().getDeclaredMethods()), new Predicate<Method>() {
+//
+//			@Override
+//			public boolean apply(Method arg0) {
+//				if (arg0.isAnnotationPresent(GetLabel.class)){
+//					return String.class.isAssignableFrom(arg0.getReturnType()) && arg0.getParameterTypes().length == 0;
+//				}
+//				return false;
+//			}
+//		}, null);
+//	}
 
 	/**
 	 * This handles model notifications by calling {@link #updateChildren} to update any cached

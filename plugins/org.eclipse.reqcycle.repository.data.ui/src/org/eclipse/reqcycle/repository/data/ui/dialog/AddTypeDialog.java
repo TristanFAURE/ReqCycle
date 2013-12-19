@@ -10,7 +10,7 @@
  * Contributors:
  *  Anass RADOUANI (AtoS) anass.radouani@atos.net - Initial API and implementation
  *
-  *****************************************************************************/
+ *****************************************************************************/
 package org.eclipse.reqcycle.repository.data.ui.dialog;
 
 import org.eclipse.core.databinding.DataBindingContext;
@@ -30,20 +30,19 @@ import org.eclipse.swt.widgets.Shell;
 
 
 public class AddTypeDialog extends NameDialog {
-	
+
 	/**
 	 * Element Types
 	 */
 	static enum TYPE {
-		REQUIREMENT,
-		ENUMERATION
+		REQUIREMENT, ENUMERATION
 	}
-	
+
 	/**
 	 * The popup Bean
 	 */
 	public class Bean extends NameBean {
-		
+
 		private TYPE type;
 
 		public Bean(Listener listener) {
@@ -54,14 +53,15 @@ public class AddTypeDialog extends NameDialog {
 			this.type = type;
 			listener.handleEvent(new Event());
 		}
-		
+
 		public TYPE getType() {
 			return type;
 		}
 	}
-	
-	
+
+
 	private Button btnReqRadio;
+
 	private Button btnEnumRadio;
 
 	public AddTypeDialog(Shell parentShell, String title) {
@@ -74,11 +74,11 @@ public class AddTypeDialog extends NameDialog {
 		Label typelbl = new Label(parent, SWT.None);
 		typelbl.setText("Type :");
 		typelbl.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false));
-		
+
 		Composite radioComposite = new Composite(parent, SWT.None);
 		radioComposite.setLayout(new GridLayout(1, false));
 		radioComposite.setLayoutData(new GridData(SWT.FILL, SWT.FILL, false, false));
-		
+
 		btnReqRadio = new Button(radioComposite, SWT.RADIO);
 		btnReqRadio.setLayoutData(new GridData(SWT.FILL, SWT.FILL, false, false));
 		btnReqRadio.setText("Requirement");
@@ -90,36 +90,36 @@ public class AddTypeDialog extends NameDialog {
 		btnReqRadio.setSelection(true);
 		((Bean)bean).setType(TYPE.REQUIREMENT);
 	};
-	
-	
+
+
 	/**
 	 * @return true if Requirement has been chosen instead of Enumeration
 	 */
 	public boolean isRequirement() {
 		return TYPE.REQUIREMENT.equals(((Bean)bean).getType());
 	}
-	
+
 	/**
-	 * @return true if Enumeration has been chosen instead of Requirement 
+	 * @return true if Enumeration has been chosen instead of Requirement
 	 */
 	public boolean isEnumeration() {
 		return TYPE.ENUMERATION.equals(((Bean)bean).getType());
 	}
-	
+
 	@Override
 	protected void doInitDataBindings(DataBindingContext bindingContext) {
 		//Create the Select Observable for our enum type  
 		SelectObservableValue typeRadioObservable = new SelectObservableValue(TYPE.class);
-		
+
 		//bind the requirement radio button selection to the right enum value  
 		IObservableValue btnRequirementObserverSelection = SWTObservables.observeSelection(btnReqRadio);
 		typeRadioObservable.addOption(TYPE.REQUIREMENT, btnRequirementObserverSelection);
-		
+
 		//bind the enumeration radio button selection to the right enum value 
 		IObservableValue btnEnumerationObserverSelection = SWTObservables.observeSelection(btnEnumRadio);
 		typeRadioObservable.addOption(TYPE.ENUMERATION, btnEnumerationObserverSelection);
-		
-		bindingContext.bindValue(typeRadioObservable, PojoObservables.observeValue(bean ,"type"));
+
+		bindingContext.bindValue(typeRadioObservable, PojoObservables.observeValue(bean, "type"));
 	}
 
 	@Override
@@ -129,5 +129,5 @@ public class AddTypeDialog extends NameDialog {
 		}
 		return true;
 	}
-	
+
 }

@@ -25,6 +25,15 @@ public class EMFConfResourceFactory implements Resource.Factory {
 
 	public class EMFConfResource extends XMIResourceImpl {
 
+		@Override
+		protected boolean useUUIDs() {
+			return true;
+		}
+
+		
+		public EMFConfResource() {
+		}
+		
 		public EMFConfResource(URI uri) {
 			super(uri);
 		}

@@ -1,7 +1,4 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <site>
-   <feature url="features/org.eclipse.nebula.widgets.nattable.feature_1.0.0.201308291705.jar" id="org.eclipse.nebula.widgets.nattable.feature" version="1.0.0.201308291705"/>
-   <feature url="features/org.eclipse.reqcycle.feature_1.0.0.201308291705.jar" id="org.eclipse.reqcycle.feature" version="1.0.0.201308291705"/>
-   <feature url="features/org.eclipse.ziggurat.feature_0.0.1.201308291705.jar" id="org.eclipse.ziggurat.feature" version="0.0.1.201308291705"/>
-   <feature url="features/org.topcased.iterators.feature_1.0.0.201308291705.jar" id="org.topcased.iterators.feature" version="1.0.0.201308291705"/>
+   <feature url="features/org.eclipse.reqcycle.feature_1.0.0.201311151611.jar" id="org.eclipse.reqcycle.feature" version="1.0.0.201311151611"/>
 </site>

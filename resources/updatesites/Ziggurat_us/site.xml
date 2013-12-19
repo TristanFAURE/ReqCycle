@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<site>
+   <feature url="features/org.eclipse.ziggurat.feature_0.0.1.201310211046.jar" id="org.eclipse.ziggurat.feature" version="0.0.1.201310211046"/>
+</site>

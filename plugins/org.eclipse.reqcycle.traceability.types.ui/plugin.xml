@@ -5,6 +5,7 @@
 -->
 
 <plugin>
+   <extension-point id="typeEntry" name="Type Entry" schema="schema/typeEntry.exsd"/>
 
    <extension point="org.eclipse.emf.edit.itemProviderAdapterFactories">
       <factory
@@ -68,6 +69,11 @@
       <handler
             class="org.eclipse.reqcycle.traceability.types.configuration.predicates.PredicateEditorForTraceabilityHandler"
             commandId="org.eclipse.reqcycle.traceability.types.ui.predicateEditor">
+            <!--<enabledWhen>
+          <equals
+                value="true">
+          </equals>
+       </enabledWhen>-->
       </handler>
    </extension>
    <extension
@@ -90,6 +96,13 @@
             impl="org.eclipse.reqcycle.traceability.types.ui.impl.StylePredicateProvider"
             interface="org.eclipse.reqcycle.traceability.types.ui.IStylePredicateProvider">
       </binding>
+   </extension>
+   <extension
+         point="org.eclipse.reqcycle.traceability.types.ui.typeEntry">
+      <type
+            class="java.lang.String"
+            entry="org.eclipse.reqcycle.traceability.types.ui.StringFieldEntry">
+      </type>
    </extension>
 
 </plugin>

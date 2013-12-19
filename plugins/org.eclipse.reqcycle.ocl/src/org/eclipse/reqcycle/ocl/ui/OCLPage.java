@@ -43,12 +43,10 @@ import org.eclipse.ocl.examples.pivot.utilities.BaseResource;
 import org.eclipse.reqcycle.ocl.ReqcycleOCLPlugin;
 import org.eclipse.reqcycle.ocl.ui.OCLConnector.SettingBean;
 import org.eclipse.reqcycle.ocl.utils.OCLUtilities;
-import org.eclipse.reqcycle.repository.data.types.DataModel;
-import org.eclipse.reqcycle.repository.data.types.DataType;
-import org.eclipse.reqcycle.repository.data.types.DataTypeAttribute;
-import org.eclipse.reqcycle.repository.data.types.EnumeratorType;
-import org.eclipse.reqcycle.repository.data.types.RequirementType;
-import org.eclipse.reqcycle.repository.data.types.RequirementTypeAttribute;
+import org.eclipse.reqcycle.repository.data.types.IDataModel;
+import org.eclipse.reqcycle.repository.data.types.IEnumerator;
+import org.eclipse.reqcycle.repository.data.types.IRequirementType;
+import org.eclipse.reqcycle.repository.data.types.IAttribute;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
@@ -102,14 +100,14 @@ public class OCLPage extends WizardPage implements Listener {
 	private TableViewerColumn tvcAttributesTypes;
 
 	/** Viewers Inputs */
-	private Collection<DataType> inputTypes = new ArrayList<DataType>();
+	private Collection<IRequirementType> inputTypes = new ArrayList<IRequirementType>();
 
-	private Collection<DataTypeAttribute> inputAttributes = new ArrayList<DataTypeAttribute>();
+	private Collection<IAttribute> inputAttributes = new ArrayList<IAttribute>();
 
 	/** Viewers Selected Items */
-	protected DataModel selectedModel;
+	protected IDataModel selectedModel;
 
-	protected DataType selectedType;
+	protected IRequirementType selectedType;
 
 	private Text tFile;
 
@@ -167,8 +165,8 @@ public class OCLPage extends WizardPage implements Listener {
 
 			@Override
 			public String getText(Object element) {
-				if(element instanceof DataType) {
-					return ((DataType)element).getName();
+				if(element instanceof IRequirementType) {
+					return ((IRequirementType)element).getName();
 				}
 				return super.getText(element);
 			}
@@ -180,11 +178,11 @@ public class OCLPage extends WizardPage implements Listener {
 
 			@Override
 			public String getText(Object element) {
-				if(element instanceof RequirementType) {
+				if(element instanceof IRequirementType) {
 					if(resource == null) {
 						return "An ocl file has to be selected and must compile";
 					}
-					IStatus testPresentForDataType = OCLUtilities.isOperationPresent((RequirementType)element, resource);
+					IStatus testPresentForDataType = OCLUtilities.isOperationPresent((IRequirementType)element, resource);
 					return testPresentForDataType.getMessage();
 				}
 				return "No need for an operation";
@@ -237,10 +235,10 @@ public class OCLPage extends WizardPage implements Listener {
 
 			@Override
 			public String getText(Object element) {
-				if(element instanceof RequirementTypeAttribute) {
-					return ((RequirementTypeAttribute)element).getName();
-				} else if(element instanceof EnumeratorType) {
-					return ((EnumeratorType)element).getName();
+				if(element instanceof IAttribute) {
+					return ((IAttribute)element).getName();
+				} else if(element instanceof IEnumerator) {
+					return ((IEnumerator)element).getName();
 				}
 				return super.getText(element);
 			}
@@ -252,15 +250,15 @@ public class OCLPage extends WizardPage implements Listener {
 
 			@Override
 			public String getText(Object element) {
-				if(element instanceof RequirementTypeAttribute) {
+				if(element instanceof IAttribute) {
 					if(resource == null) {
 						return "An ocl file has to be selected and must compile";
 					}
-					RequirementTypeAttribute attribute = (RequirementTypeAttribute)element;
+					IAttribute attribute = (IAttribute)element;
 					IStatus testPresentForDataType = OCLUtilities.isOperationPresent(attribute, resource);
 					return testPresentForDataType.getMessage();
 				}
-				if(element instanceof EnumeratorType) {
+				if(element instanceof IEnumerator) {
 					return "-";
 				}
 				return super.getText(element);
@@ -284,15 +282,15 @@ public class OCLPage extends WizardPage implements Listener {
 				ISelection selection = event.getSelection();
 				if(selection instanceof IStructuredSelection) {
 					Object obj = ((IStructuredSelection)selection).getFirstElement();
-					if(obj instanceof DataType) {
-						selectedType = (DataType)obj;
-						Collection<? extends DataTypeAttribute> attributes = selectedType.getAttributes();
-						Iterable<? extends DataTypeAttribute> filtered = Iterables.filter(attributes, new Predicate<DataTypeAttribute>() {
+					if(obj instanceof IRequirementType) {
+						selectedType = (IRequirementType)obj;
+						Collection<? extends IAttribute> attributes = selectedType.getAttributes();
+						Iterable<? extends IAttribute> filtered = Iterables.filter(attributes, new Predicate<IAttribute>() {
 
 							@Override
-							public boolean apply(DataTypeAttribute arg0) {
-								if(arg0 instanceof RequirementTypeAttribute) {
-									if("uri".equals(((RequirementTypeAttribute)arg0).getName())) {
+							public boolean apply(IAttribute arg0) {
+								if(arg0 instanceof IAttribute) {
+									if("uri".equals(((IAttribute)arg0).getName())) {
 										return false;
 									}
 								}
@@ -361,9 +359,9 @@ public class OCLPage extends WizardPage implements Listener {
 	}
 
 	private void updateDataTypes() {
-		DataModel dataPackage = bean.getDataPackage();
+		IDataModel dataPackage = bean.getDataPackage();
 		if(dataPackage != null) {
-			Collection<RequirementType> dataTypes = dataPackage.getDataTypes();
+			Collection<IRequirementType> dataTypes = dataPackage.getRequirementTypes();
 			inputTypes.clear();
 			inputTypes.addAll(dataTypes);
 		}

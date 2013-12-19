@@ -10,7 +10,7 @@
       <package
             uri="http://www.eclipse.org/ReqCycle/DataModel"
             class="DataModel.DataModelPackage"
-            genModel="model/DataModel.genmodel"/>
+            genModel="model/RequirementSourceData.genmodel"/>
    </extension>
 
    <extension point="org.eclipse.emf.edit.itemProviderAdapterFactories">
@@ -27,18 +27,24 @@
    </extension>
 
    <extension point="org.eclipse.emf.ecore.generated_package">
-      <!-- @generated RequirementSourcesConf -->
+      <!-- @generated RequirementSourceConf -->
       <package
-            uri="http://www.eclipse.org/ReqCycle/RequirementSourcesConf"
-            class="RequirementSourcesConf.RequirementSourcesConfPackage"
-            genModel="model/RequirementSourcesConf.genmodel"/>
+            uri="http://www.eclipse.org/ReqCycle/RequirementSourceConf"
+            class="RequirementSourceConf.RequirementSourceConfPackage"
+            genModel="model/RequirementSourceConf.genmodel"/>
    </extension>
 
-   <extension point="org.eclipse.emf.ecore.extension_parser">
-      <!-- @generated RequirementSourcesConf -->
-      <parser
-            type="requirementsourcesconf"
-            class="RequirementSourcesConf.util.RequirementSourcesConfResourceFactoryImpl"/>
+   <extension point="org.eclipse.emf.edit.itemProviderAdapterFactories">
+      <!-- @generated RequirementSourceConf -->
+      <factory
+            uri="http://www.eclipse.org/ReqCycle/RequirementSourceConf"
+            class="RequirementSourceConf.provider.RequirementSourceConfItemProviderAdapterFactory"
+            supportedTypes=
+              "org.eclipse.emf.edit.provider.IEditingDomainItemProvider
+               org.eclipse.emf.edit.provider.IStructuredItemContentProvider
+               org.eclipse.emf.edit.provider.ITreeItemContentProvider
+               org.eclipse.emf.edit.provider.IItemLabelProvider
+               org.eclipse.emf.edit.provider.IItemPropertySource"/>
    </extension>
 
    <extension point="org.eclipse.emf.ecore.generated_package">
@@ -64,12 +70,8 @@
    <extension
          point="org.eclipse.ziggurat.inject.binding">
       <binding
-            impl="org.eclipse.reqcycle.repository.data.impl.RequirementSourceManagerImpl"
-            interface="org.eclipse.reqcycle.repository.data.IRequirementSourceManager">
-      </binding>
-      <binding
-            impl="org.eclipse.reqcycle.repository.data.impl.RequirementCreatorImpl"
-            interface="org.eclipse.reqcycle.repository.data.IRequirementCreator">
+            impl="org.eclipse.reqcycle.repository.data.impl.DataManagerImpl"
+            interface="org.eclipse.reqcycle.repository.data.IDataManager">
       </binding>
       <binding
             impl="org.eclipse.reqcycle.repository.data.impl.DataModelManagerImpl"
@@ -101,6 +103,121 @@
             handler="org.eclipse.reqcycle.repository.data.reachables.ConfReachableHandler"
             priority="10">
       </reachableHandler>
+   </extension>
+   <extension
+         point="org.eclipse.ui.importWizards">
+      <wizard
+            class="org.eclipse.reqcycle.repository.data.ImportDataModel"
+            id="org.eclipse.reqcycle.repository.data.types.import"
+            name="Import Data Model">
+      </wizard>
+   </extension>
+
+   <extension point="org.eclipse.emf.ecore.generated_package">
+      <!-- @generated RequirementSourceData -->
+      <package
+            uri="http://www.eclipse.org/ReqCycle/RequirementSourceData"
+            class="RequirementSourceData.RequirementSourceDataPackage"
+            genModel="model/RequirementSourceData.genmodel"/>
+   </extension>
+
+   <extension point="org.eclipse.emf.ecore.extension_parser">
+      <!-- @generated RequirementSourceData -->
+      <parser
+            type="requirementsourcedata"
+            class="RequirementSourceData.util.RequirementSourceDataResourceFactoryImpl"/>
+   </extension>
+
+   <extension point="org.eclipse.emf.edit.itemProviderAdapterFactories">
+      <!-- @generated RequirementSourceData -->
+      <factory
+            uri="http://www.eclipse.org/ReqCycle/RequirementSourceData"
+            class="RequirementSourceData.provider.RequirementSourceDataItemProviderAdapterFactory"
+            supportedTypes=
+              "org.eclipse.emf.edit.provider.IEditingDomainItemProvider
+               org.eclipse.emf.edit.provider.IStructuredItemContentProvider
+               org.eclipse.emf.edit.provider.ITreeItemContentProvider
+               org.eclipse.emf.edit.provider.IItemLabelProvider
+               org.eclipse.emf.edit.provider.IItemPropertySource"/>
+   </extension>
+   <extension point="org.eclipse.emf.ecore.generated_package">
+      <!-- @generated Scopes -->
+      <package
+            uri="http://www.eclipse.org/ReqCycle/Scopes"
+            class="Scopes.ScopesPackage"
+            genModel="model/Scopes.genmodel"/>
+   </extension>
+
+   <extension point="org.eclipse.emf.ecore.generated_package">
+      <!-- @generated ScopeConf -->
+      <package
+            uri="http://www.eclipse.org/ReqCycle/ScopeConf"
+            class="ScopeConf.ScopeConfPackage"
+            genModel="model/ScopeConf.genmodel"/>
+   </extension>
+
+   <extension point="org.eclipse.emf.edit.itemProviderAdapterFactories">
+      <!-- @generated ScopeConf -->
+      <factory
+            uri="http://www.eclipse.org/ReqCycle/ScopeConf"
+            class="ScopeConf.provider.ScopeConfItemProviderAdapterFactory"
+            supportedTypes=
+              "org.eclipse.emf.edit.provider.IEditingDomainItemProvider
+               org.eclipse.emf.edit.provider.IStructuredItemContentProvider
+               org.eclipse.emf.edit.provider.ITreeItemContentProvider
+               org.eclipse.emf.edit.provider.IItemLabelProvider
+               org.eclipse.emf.edit.provider.IItemPropertySource"/>
+      <factory
+            class="org.eclipse.reqcycle.repository.data.DataModelAdapterFactory"
+            uri="http://www.eclipse.org/emf/2002/Ecore"
+            supportedTypes=
+              "org.eclipse.emf.edit.provider.IItemLabelProvider"/>
+   </extension>
+   <extension
+         point="org.eclipse.emf.ecore.extension_parser">
+      <parser
+            class="org.eclipse.ziggurat.configuration.impl.EMFConfResourceFactory"
+            type="reqcycle">
+      </parser>
+   </extension>
+   <extension
+         point="org.eclipse.reqcycle.traceability.types.ui.typeEntry">
+      <type
+            class="org.eclipse.reqcycle.repository.data.types.IDataModel"
+            entry="org.eclipse.reqcycle.repository.data.DataModelEntryProvider">
+      </type>
+      <type
+            class="org.eclipse.reqcycle.repository.data.types.IRequirementType"
+            entry="org.eclipse.reqcycle.repository.data.RequirementTypeEntryProvider">
+      </type>
+      <type
+            class="ScopeConf.Scope"
+            entry="org.eclipse.reqcycle.repository.data.ScopeEntryProvider">
+      </type>
+   </extension>
+   <extension
+         point="org.eclipse.core.runtime.adapters">
+      <factory
+            adaptableType="org.eclipse.reqcycle.repository.data.types.IDataModel"
+            class="org.eclipse.reqcycle.repository.data.util.DataTypesAdapterFactory">
+         <adapter
+               type="java.lang.String">
+         </adapter>
+      </factory>
+      <factory
+            adaptableType="ScopeConf.Scope"
+            class="org.eclipse.reqcycle.repository.data.util.DataTypesAdapterFactory">
+         <adapter
+               type="java.lang.String">
+         </adapter>
+      </factory>
+      <factory
+            adaptableType="org.eclipse.reqcycle.repository.data.types.IRequirementType"
+            class="org.eclipse.reqcycle.repository.data.util.DataTypesAdapterFactory">
+         <adapter
+               type="java.lang.String">
+         </adapter>
+      </factory>
    </extension>
 
 </plugin>

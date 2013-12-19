@@ -1,0 +1,12 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: Validation
+Bundle-SymbolicName: org.eclipse.ziggurat.ocl.validation;singleton:=true
+Bundle-Version: 0.0.1.qualifier
+Bundle-Activator: org.eclipse.ziggurat.ocl.validation.ZigguratOCLValidationPlugin
+Require-Bundle: org.eclipse.core.runtime,
+ org.eclipse.ocl.examples.pivot;bundle-version="3.3.0",
+ com.google.guava;bundle-version="11.0.2"
+Bundle-RequiredExecutionEnvironment: JavaSE-1.6
+Bundle-ActivationPolicy: lazy
+Export-Package: org.eclipse.ziggurat.ocl.validation

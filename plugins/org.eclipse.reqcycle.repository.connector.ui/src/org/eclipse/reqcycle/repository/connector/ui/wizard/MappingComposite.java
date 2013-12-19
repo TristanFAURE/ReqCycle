@@ -21,7 +21,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 
 import org.eclipse.emf.ecore.EObject;
-import org.eclipse.emf.ecore.EcorePackage;
 import org.eclipse.jface.viewers.ArrayContentProvider;
 import org.eclipse.jface.viewers.IBaseLabelProvider;
 import org.eclipse.jface.viewers.IContentProvider;
@@ -35,8 +34,9 @@ import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.wizard.WizardPage;
 import org.eclipse.reqcycle.repository.connector.ui.Activator;
-import org.eclipse.reqcycle.repository.data.types.RequirementTypeAttribute;
-import org.eclipse.reqcycle.repository.data.types.DataType;
+import org.eclipse.reqcycle.repository.data.types.IAttribute;
+import org.eclipse.reqcycle.repository.data.types.IEnumerationType;
+import org.eclipse.reqcycle.repository.data.types.IRequirementType;
 import org.eclipse.reqcycle.repository.data.util.DataUtil;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
@@ -71,38 +71,38 @@ public abstract class MappingComposite extends Composite {
 	private Label lblTarget;
 
 	private Label lblMapping;
-	
+
 	private WizardPage page;
 
 	private Button btnEditLink;
-	
+
 	private Button btnAutoMap;
-	
+
 	public static ITreeContentProvider contentProvider = new ITreeContentProvider() {
-		
+
 		@Override
 		public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {
 		}
-		
+
 		@Override
 		public void dispose() {
 		}
-		
+
 		@Override
 		public boolean hasChildren(Object element) {
 			return false;
 		}
-		
+
 		@Override
 		public Object getParent(Object element) {
 			return null;
 		}
-		
+
 		@Override
 		public Object[] getElements(Object inputElement) {
 			return ArrayContentProvider.getInstance().getElements(inputElement);
 		}
-		
+
 		@Override
 		public Object[] getChildren(Object parentElement) {
 			return null;
@@ -113,32 +113,28 @@ public abstract class MappingComposite extends Composite {
 		super(parent, style);
 		setLayout(new GridLayout(1, false));
 		this.page = page;
-		
+
 		Composite selectionComposite = new Composite(this, SWT.NONE);
 		selectionComposite.setLayout(new GridLayout(3, false));
 		selectionComposite.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true, 1, 1));
 
 		lblSource = new Label(selectionComposite, SWT.NONE);
-		
+
 		String sourceDetail = getSourceDetail();
 		if(sourceDetail != null && !sourceDetail.isEmpty()) {
 			lblSource.setText("Source (" + sourceDetail + ")");
-		}
-		else
-		{
+		} else {
 			lblSource.setText("Source");
 		}
-		
+
 		new Label(selectionComposite, SWT.NONE);
 
 		lblTarget = new Label(selectionComposite, SWT.NONE);
-		
+
 		String targetDetail = getTargetDetail();
 		if(targetDetail != null && !targetDetail.isEmpty()) {
 			lblTarget.setText("Target (" + targetDetail + ")");
-		}
-		else
-		{
+		} else {
 			lblTarget.setText("Target");
 		}
 
@@ -164,13 +160,11 @@ public abstract class MappingComposite extends Composite {
 		resultComposite.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true, 1, 1));
 
 		lblMapping = new Label(resultComposite, SWT.NONE);
-		
+
 		String resultDetail = getResultDetail();
 		if(resultDetail != null && !resultDetail.isEmpty()) {
 			lblMapping.setText("Mapping (" + resultDetail + ")");
-		}
-		else
-		{
+		} else {
 			lblMapping.setText("Mapping");
 		}
 		new Label(resultComposite, SWT.NONE);
@@ -188,7 +182,7 @@ public abstract class MappingComposite extends Composite {
 		btnRemoveLink.setToolTipText("Remove Link");
 		btnRemoveLink.setImage(Activator.getImageDescriptor("icons/link_break.png").createImage());
 		btnRemoveLink.setEnabled(false);
-		
+
 		//TODO : created when it's possible to edit link
 		btnEditLink = new Button(resultComposite, SWT.NONE);
 		btnEditLink.setLayoutData(new GridData(SWT.CENTER, SWT.TOP, false, false, 1, 1));
@@ -196,13 +190,13 @@ public abstract class MappingComposite extends Composite {
 		btnEditLink.setImage(Activator.getImageDescriptor("icons/link_edit.png").createImage());
 		btnEditLink.setEnabled(getCanEditLink());
 		btnEditLink.setVisible(getCanEditLink());
-		
+
 		btnAutoMap = new Button(resultComposite, SWT.NONE);
 		btnAutoMap.setText("auto");
 		btnAutoMap.setEnabled(false);
 		btnAutoMap.setVisible(false);
 		btnAutoMap.setLayoutData(new GridData(SWT.CENTER, SWT.TOP, false, false, 1, 1));
-		
+
 		hookListeners();
 	}
 
@@ -247,6 +241,7 @@ public abstract class MappingComposite extends Composite {
 		});
 
 		btnLink.addSelectionListener(new SelectionAdapter() {
+
 			@Override
 			public void widgetSelected(SelectionEvent e) {
 				EObject linkedElement = linkElements(sourceSelection, targetSelection);
@@ -261,6 +256,7 @@ public abstract class MappingComposite extends Composite {
 		});
 
 		btnRemoveLink.addSelectionListener(new SelectionAdapter() {
+
 			@Override
 			public void widgetSelected(SelectionEvent e) {
 				ISelection selection = resultViewer.getSelection();
@@ -275,37 +271,37 @@ public abstract class MappingComposite extends Composite {
 			}
 		});
 	}
-	
-	protected IContentProvider getResultContentProvider(){
+
+	protected IContentProvider getResultContentProvider() {
 		return contentProvider;
 	}
 
-	protected IBaseLabelProvider getResultLabelProvider(){
-		return DataUtil.labelProvider; 
+	protected IBaseLabelProvider getResultLabelProvider() {
+		return DataUtil.labelProvider;
 	}
 
 	protected abstract String getResultDetail();
 
 	protected abstract Object getTargetInput();
 
-	protected IContentProvider getTargetContentProvider(){
+	protected IContentProvider getTargetContentProvider() {
 		return contentProvider;
 	}
 
-	protected IBaseLabelProvider getTargetLabelProvider(){
-		return new LabelProvider(){
+	protected IBaseLabelProvider getTargetLabelProvider() {
+		return new LabelProvider() {
+
 			@Override
 			public String getText(Object element) {
-				if(element instanceof DataType) {
-					return ((DataType)element).getName();
+				if(element instanceof IRequirementType) {
+					return ((IRequirementType)element).getName();
 				}
-				if(element instanceof RequirementTypeAttribute) {
-					RequirementTypeAttribute attr = (RequirementTypeAttribute)element;
-					String typeName = attr.getType().getName();
-					String nsURI = attr.getType().getEPackage().getNsURI();
-					if(EcorePackage.eNS_URI.equals(nsURI)) {
-						typeName = typeName.replaceFirst("E", "");
-					}
+				if(element instanceof IEnumerationType) {
+					return ((IEnumerationType)element).getName();
+				}
+				if(element instanceof IAttribute) {
+					IAttribute attr = (IAttribute)element;
+					String typeName = attr.getAttributeType().getName();
 					return attr.getName() + " : " + typeName;
 				}
 				return super.getText(element);
@@ -324,27 +320,27 @@ public abstract class MappingComposite extends Composite {
 	protected abstract String getSourceDetail();
 
 	public abstract EObject linkElements(Object sourceSelection, Object targetSelection);
-	
+
 	protected abstract boolean getCanEditLink();
 
 	public Collection<EObject> getResult() {
 		return result;
 	}
 
-	public void addToResult(EObject element){
+	public void addToResult(EObject element) {
 		result.add(element);
-		if (resultViewer != null) {
+		if(resultViewer != null) {
 			resultViewer.refresh();
 			page.setPageComplete(true);
 		}
 	}
-	
-	public void addToResult(Collection<EObject> elements){
+
+	public void addToResult(Collection<EObject> elements) {
 		result.addAll(elements);
 		if(resultViewer != null) {
 			resultViewer.refresh();
 			page.setPageComplete(true);
 		}
 	}
-	
+
 }

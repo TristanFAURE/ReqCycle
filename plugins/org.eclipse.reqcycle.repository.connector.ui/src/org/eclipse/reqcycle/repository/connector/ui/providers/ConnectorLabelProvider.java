@@ -26,30 +26,25 @@ import org.eclipse.swt.widgets.Display;
 /**
  * Connector Label Provider
  */
-public class ConnectorLabelProvider extends LabelProvider
-{
-	
-    public String getText(Object obj)
-    {
-        if (obj instanceof ConnectorDescriptor)
-        {
-            return ((ConnectorDescriptor) obj).getName();
-        }
-        return obj.toString();
-    }
+public class ConnectorLabelProvider extends LabelProvider {
 
-    public Image getImage(Object obj)
-    {
-        if (obj instanceof IConnector)
-        {
-            return createImage(((ConnectorDescriptor) obj), 20, 20);
-        }
-        return null;
-    }
-    
+	public String getText(Object obj) {
+		if(obj instanceof ConnectorDescriptor) {
+			return ((ConnectorDescriptor)obj).getName();
+		}
+		return obj.toString();
+	}
+
+	public Image getImage(Object obj) {
+		if(obj instanceof IConnector) {
+			return createImage(((ConnectorDescriptor)obj), 20, 20);
+		}
+		return null;
+	}
+
 	public static Image createImage(ConnectorDescriptor connector, int width, int height) {
 		ImageDescriptor imageDescriptor = connector.getImageDescriptor();
-		if (imageDescriptor == null){
+		if(imageDescriptor == null) {
 			return null;
 		}
 		Image image = imageDescriptor.createImage();
@@ -62,5 +57,5 @@ public class ConnectorLabelProvider extends LabelProvider
 		image.dispose();
 		return scaled;
 	}
-    
+
 }

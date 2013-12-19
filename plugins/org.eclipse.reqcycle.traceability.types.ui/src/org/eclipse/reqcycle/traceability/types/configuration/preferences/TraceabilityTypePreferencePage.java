@@ -96,5 +96,16 @@ public class TraceabilityTypePreferencePage extends AbstractPreferencePage {
 			}
 		}
 	}
+	
+	@Override
+	public void setVisible(boolean visible) {
+		if(visible) {
+			doLoad();
+			setInput();
+		}
+		super.setVisible(visible);
+	}
 
+	
+	
 }

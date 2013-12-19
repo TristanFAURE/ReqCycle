@@ -33,4 +33,8 @@ public class RestrictedResourceSet extends ResourceSetImpl {
 		}
 		return super.getResource(uri, loadOnDemand);
 	}
+	
+	
+	public RestrictedResourceSet() {
+	}
 }

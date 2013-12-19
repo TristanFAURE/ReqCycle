@@ -19,7 +19,8 @@ Require-Bundle: org.eclipse.ui,
  org.eclipse.emf.common.ui;bundle-version="2.8.0",
  org.eclipse.reqcycle.traceability.types,
  org.eclipse.reqcycle.traceability.types.ui,
- org.eclipse.e4.ui.di;bundle-version="1.0.0"
+ org.eclipse.e4.ui.di;bundle-version="1.0.0",
+ org.eclipse.ui.views
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Import-Package: javax.annotation;version="1.1.0",
  javax.inject;version="1.0.0"

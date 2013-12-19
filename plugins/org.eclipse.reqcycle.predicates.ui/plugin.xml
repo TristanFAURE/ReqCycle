@@ -91,6 +91,11 @@
      <handler
            class="org.eclipse.reqcycle.predicates.ui.handlers.OpenPredicatesEditorHandler"
            commandId="org.eclipse.reqcycle.repository.ui.commands.OpenPredicatesEditorCommand">
+           <enabledWhen>
+          <equals
+                value="false">
+          </equals>
+       </enabledWhen>
      </handler>
   </extension>
   <extension

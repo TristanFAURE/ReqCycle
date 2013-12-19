@@ -8,7 +8,7 @@ import java.util.Map;
 import java.util.Set;
 
 import org.eclipse.reqcycle.traceability.model.TType;
-import org.eclipse.reqcycle.traceability.storage.blueprints.graph.ISpecificGraphProvider;
+import org.eclipse.reqcycle.traceability.storage.blueprints.graph.IBusinessOperationProvider;
 import org.eclipse.reqcycle.uri.model.Reachable;
 
 import com.google.common.base.Function;
@@ -22,7 +22,7 @@ import com.tinkerpop.blueprints.Vertex;
 import static com.google.common.collect.Iterables.filter;
 import static com.google.common.collect.Iterables.transform;
 
-public class GraphUtils implements ISpecificGraphProvider.IBusinessOperations {
+public class GraphUtils implements IBusinessOperationProvider.IBusinessOperations {
 	private static final String KIND = "kind";
 	// EDGES
 	public static final String CHILDREN_EDGE = "children";

@@ -10,7 +10,7 @@
  * Contributors:
  *  Anass RADOUANI (AtoS) anass.radouani@atos.net - Initial API and implementation
  *
-  *****************************************************************************/
+ *****************************************************************************/
 package org.eclipse.reqcycle.repository.data.ui.dialog;
 
 import org.eclipse.core.databinding.DataBindingContext;
@@ -35,45 +35,46 @@ import org.eclipse.swt.widgets.Text;
  */
 public class NameDialog extends Dialog implements Listener {
 
-	
+
 	/**
 	 * The popup Bean
 	 */
 	public class NameBean {
-		
+
 		protected Listener listener;
+
 		private String name;
 
 		public NameBean(Listener listener) {
 			this.listener = listener;
 		}
-		
+
 		public String getName() {
 			return name;
 		}
-		
+
 		public void setName(String name) {
 			this.name = name;
 			handleEvent(new Event());
 		}
-		
+
 		public void handleEvent(Event event) {
 			if(listener != null) {
 				listener.handleEvent(event);
 			}
 		}
-		
+
 		protected Listener getListener() {
 			return listener;
 		}
 	}
-	
+
 	/** popup bean for databinding */
 	protected NameBean bean;
-	
+
 	/** popup text field */
 	protected Text txtName;
-	
+
 	/** popup title */
 	private String title;
 
@@ -81,43 +82,44 @@ public class NameDialog extends Dialog implements Listener {
 		super(parentShell);
 		this.title = title;
 	}
-	
-	public NameDialog(Shell parentShell, String title, NameBean bean){
+
+	public NameDialog(Shell parentShell, String title, NameBean bean) {
 		this(parentShell, title);
 		this.bean = bean;
 	}
-	
-	
+
+
 	@Override
 	protected Control createDialogArea(Composite parent) {
-		
+
 		Shell shell = getShell();
 		if(shell != null) {
 			shell.setText(title);
 		}
-		
+
 		Composite control = (Composite)super.createDialogArea(parent);
-		
+
 		Composite composite = new Composite(control, SWT.None);
 		composite.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false));
 		composite.setLayout(new GridLayout(2, false));
-		
+
 		Label lblName = new Label(composite, SWT.None);
 		lblName.setText("Name :");
-		
+
 		txtName = new Text(composite, SWT.BORDER);
 		txtName.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false));
-		
+
 		doCreateDialogArea(composite);
 
 		initDataBindings();
-		
+
 		return control;
 	};
-	
-	
+
+
 	/**
 	 * Override this method to add custom Ui
+	 * 
 	 * @param control
 	 */
 	protected void doCreateDialogArea(Composite control) {
@@ -131,16 +133,16 @@ public class NameDialog extends Dialog implements Listener {
 		}
 		return button;
 	}
-	
-	
+
+
 	/**
 	 * @return Entered Name
 	 */
 	public String getName() {
 		return bean.getName();
 	}
-	
-	
+
+
 	/**
 	 * Perfom binding between the popup and the bean
 	 * 
@@ -160,21 +162,23 @@ public class NameDialog extends Dialog implements Listener {
 		//
 		return bindingContext;
 	}
-	
+
 	/**
 	 * Override this method to add data binding
-	 * @param bindingContext the binding context
+	 * 
+	 * @param bindingContext
+	 *        the binding context
 	 */
 	protected void doInitDataBindings(DataBindingContext bindingContext) {
 	}
 
-	
+
 	/**
 	 * Enables the button OK
 	 * 
 	 * @param enable
 	 */
-	private void enableOKbtn(boolean enable){
+	private void enableOKbtn(boolean enable) {
 		Button okBtn = getButton(OK);
 		if(okBtn != null) {
 			okBtn.setEnabled(enable);
@@ -185,32 +189,34 @@ public class NameDialog extends Dialog implements Listener {
 	public void handleEvent(Event event) {
 		String name = bean.getName();
 		boolean enableOK = true;
-		if(name == null || name.isEmpty() ) {
+		if(name == null || name.isEmpty()) {
 			enableOK = false;
 		}
-		
+
 		if(!doHandleEvent(event)) {
 			enableOK = false;
 		}
-		
+
 		enableOKbtn(enableOK);
 	}
 
 	/**
 	 * Override this method to handle changes modifications events
 	 * 
-	 * @param event the event which occurred
+	 * @param event
+	 *        the event which occurred
 	 * @return return false if OK button have to be disabled
 	 */
 	public boolean doHandleEvent(Event event) {
 		return true;
 	}
-	
-	
+
+
 	/**
 	 * Sets the popup bean
 	 * 
-	 * @param bean the bean to set
+	 * @param bean
+	 *        the bean to set
 	 */
 	public void setBean(NameBean bean) {
 		this.bean = bean;

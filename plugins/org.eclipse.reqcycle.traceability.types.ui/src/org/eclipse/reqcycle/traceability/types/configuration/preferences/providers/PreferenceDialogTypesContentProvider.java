@@ -18,6 +18,7 @@ import com.google.common.base.Predicate;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 
+//FIXME : Don't use a container given in the constructor (Or don't copy the container at each display)
 public class PreferenceDialogTypesContentProvider extends
 		AdapterFactoryContentProvider {
 	@Inject
@@ -78,5 +79,11 @@ public class PreferenceDialogTypesContentProvider extends
 			return list.toArray();
 		}
 		return super.getChildren(object);
+	}
+
+	public void setTypeConfigContainer(TypeConfigContainer container) {
+		if(container != null) {
+			this.container = container;
+		}
 	}
 }

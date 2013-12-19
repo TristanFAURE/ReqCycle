@@ -14,20 +14,28 @@ import javax.inject.Inject;
 import javax.inject.Named;
 
 import org.eclipse.core.resources.IProject;
+import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.reqcycle.traceability.model.Link;
 import org.eclipse.reqcycle.traceability.storage.IStorageProvider;
+import org.eclipse.reqcycle.traceability.types.ITraceabilityAttributesManager;
+import org.eclipse.reqcycle.traceability.ui.LinkPropertySource;
+import org.eclipse.ui.views.properties.IPropertySource;
+import org.eclipse.ui.views.properties.IPropertySource2;
 
 /**
  * Creating a new link for deletion purpose.
  * @author omelois
  *
  */
-public class TransverseLink extends Link {
+public class TransverseLink extends Link implements IAdaptable {
 
 	@Inject
 	@Named("RDF")
 	protected IStorageProvider provider;
 
+	@Inject 
+	protected ITraceabilityAttributesManager attributeManager;
+	
 	private IProject project;
 	
 	public TransverseLink(Link link, IProject project) {
@@ -39,4 +47,12 @@ public class TransverseLink extends Link {
 		return project;
 	}
 
+	@Override
+	public Object getAdapter(Class adapter) {
+		if (IPropertySource.class.equals(adapter) || IPropertySource2.class.equals(adapter)){
+			return new LinkPropertySource(this, null);
+		}
+		return null;
+	}
+	
 }

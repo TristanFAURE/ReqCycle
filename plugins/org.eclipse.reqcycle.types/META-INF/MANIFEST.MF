@@ -9,7 +9,13 @@ Require-Bundle: org.eclipse.core.runtime,
  org.eclipse.core.resources;bundle-version="3.8.1",
  org.eclipse.jface;bundle-version="3.8.102",
  org.eclipse.ui;bundle-version="3.104.0",
- org.eclipse.ziggurat.inject
+ org.eclipse.ziggurat.inject,
+ org.eclipse.core.databinding,
+ org.eclipse.core.databinding.beans,
+ org.eclipse.core.databinding.observable,
+ org.eclipse.core.databinding.property,
+ org.eclipse.jface.databinding,
+ com.ibm.icu
 Bundle-ActivationPolicy: lazy
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Export-Package: org.eclipse.reqcycle.types

@@ -5,10 +5,12 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.OutputStreamWriter;
 import java.nio.charset.Charset;
 
-import org.eclipse.reqcycle.traceability.storage.blueprints.graph.ISpecificGraphProvider;
+import org.eclipse.reqcycle.traceability.storage.blueprints.graph.IBusinessOperationProvider;
+import org.eclipse.reqcycle.traceability.storage.blueprints.graph.IOneFileGraphProvider;
 import org.eclipse.ziggurat.inject.ZigguratInject;
 import org.openrdf.model.Resource;
 import org.openrdf.repository.RepositoryException;
@@ -25,7 +27,7 @@ import org.openrdf.sail.memory.MemoryStore;
 import com.tinkerpop.blueprints.Graph;
 import com.tinkerpop.blueprints.impls.sail.SailGraph;
 
-public class SailGraphProvider implements ISpecificGraphProvider {
+public class SailGraphProvider implements IOneFileGraphProvider, IBusinessOperationProvider {
 
 	@Override
 	public Graph getGraph(String path) {
@@ -34,6 +36,17 @@ public class SailGraphProvider implements ISpecificGraphProvider {
 		// Sail sail = nativeStoreSailGraph.getRawGraph();
 		// return nativeStoreSailGraph;
 		return getGraph(path, RDFFormat.RDFXML);
+	}
+	
+
+	@Override
+	public Graph getGraph(InputStream inputStream) {
+		MemoryStore store = new MemoryStore();
+		store.setPersist(false);
+		store.setSyncDelay(1000L);
+		CustomSailGraph customSailGraph = new CustomSailGraph(inputStream, RDFFormat.RDFXML,
+				store);
+		return customSailGraph;
 	}
 
 	public Graph getGraph(String path, RDFFormat format) {
@@ -66,6 +79,18 @@ public class SailGraphProvider implements ISpecificGraphProvider {
 				} catch (RepositoryException e) {
 				} catch (IOException e) {
 				}
+			}
+		}
+
+		public CustomSailGraph(InputStream inputStream, RDFFormat format, MemoryStore store) {
+			super(new MemoryStore());
+			this.format = format;
+			SailRepository repo = new SailRepository(getRawGraph());
+			try {
+				repo.getConnection().add(inputStream, "", format, new Resource[]{});
+			} catch (RDFParseException e) {
+			} catch (RepositoryException e) {
+			} catch (IOException e) {
 			}
 		}
 
@@ -128,4 +153,5 @@ public class SailGraphProvider implements ISpecificGraphProvider {
 		ZigguratInject.inject(sailBusinessOperations);
 		return sailBusinessOperations;
 	}
+
 }

@@ -10,7 +10,7 @@
  * Contributors:
  *  Anass RADOUANI (AtoS) anass.radouani@atos.net - Initial API and implementation
  *
-  *****************************************************************************/
+ *****************************************************************************/
 package org.eclipse.reqcycle.repository.data.ui.preference.pages;
 
 import java.util.ArrayList;
@@ -18,8 +18,8 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.eclipse.emf.ecore.EDataType;
-import org.eclipse.emf.ecore.EcorePackage;
+import org.eclipse.core.runtime.IAdaptable;
+import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.layout.TableColumnLayout;
 import org.eclipse.jface.viewers.ArrayContentProvider;
 import org.eclipse.jface.viewers.ColumnLabelProvider;
@@ -31,13 +31,12 @@ import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.jface.viewers.TableViewerColumn;
 import org.eclipse.jface.window.Window;
-import org.eclipse.reqcycle.repository.data.types.DataType;
-import org.eclipse.reqcycle.repository.data.types.DataTypeAttribute;
-import org.eclipse.reqcycle.repository.data.types.DataModel;
-import org.eclipse.reqcycle.repository.data.types.EnumerationType;
-import org.eclipse.reqcycle.repository.data.types.EnumeratorType;
-import org.eclipse.reqcycle.repository.data.types.RequirementType;
-import org.eclipse.reqcycle.repository.data.types.RequirementTypeAttribute;
+import org.eclipse.reqcycle.repository.data.types.IAttribute;
+import org.eclipse.reqcycle.repository.data.types.IAttributeType;
+import org.eclipse.reqcycle.repository.data.types.IDataModel;
+import org.eclipse.reqcycle.repository.data.types.IEnumerationType;
+import org.eclipse.reqcycle.repository.data.types.IEnumerator;
+import org.eclipse.reqcycle.repository.data.types.IRequirementType;
 import org.eclipse.reqcycle.repository.data.ui.Activator;
 import org.eclipse.reqcycle.repository.data.ui.dialog.AddAttributeDialog;
 import org.eclipse.reqcycle.repository.data.ui.dialog.AddTypeDialog;
@@ -61,44 +60,58 @@ import com.google.common.collect.Collections2;
 
 public class DataTypesPreferencePage extends DataModelsPreferencePage {
 
-	/** Types Viewer Elements */ 
+	/** Types Viewer Elements */
 	protected TableViewer tvTypes;
+
 	protected Table tTypes;
+
 	protected TableViewerColumn tvcTypesNames;
+
 	protected TableViewerColumn tvcTypesTypes;
 
 	/** Attributes Viewer Elements */
 	protected TableViewer tvAttributes;
+
 	protected Table tAttributes;
+
 	protected TableViewerColumn tvcAttributesNames;
+
 	protected TableViewerColumn tvcAttributesTypes;
 
 	/** Add Buttons */
 	protected Button btnAddType;
+
 	protected Button btnAddAttribute;
 
 	/** Edit Buttons */
 	protected Button btnEditAttribute;
+
 	protected Button btnEditType;
 
 	/** Viewers Inputs */
-	protected Collection<DataType> inputTypes = new ArrayList<DataType>();
-	protected Collection<DataTypeAttribute> inputAttributes = new ArrayList<DataTypeAttribute>();
+	protected Collection<Object> inputTypes = new ArrayList<Object>();
+
+	protected Collection<Object> inputAttributes = new ArrayList<Object>();
 
 	/** Viewers Selected Items */
-	protected DataModel selectedModel;
-	protected DataType selectedType;
+	protected IDataModel selectedModel;
+
+	protected Object selectedType;
+
 	private Button btnDeleteAttribute;
+
 	private Button btnDeleteType;
-	
-	
+
+	private Boolean dirty = false;
+
+
 	public DataTypesPreferencePage() {
 	}
 
 	@Override
 	public void handleEvent(Event event) {
 		super.handleEvent(event);
-		
+
 		inputTypes.clear();
 		if(tvTypes != null) {
 			tvTypes.refresh();
@@ -109,7 +122,7 @@ public class DataTypesPreferencePage extends DataModelsPreferencePage {
 			tvAttributes.refresh();
 		}
 	}
-	
+
 	@Override
 	public void doCreateContents(Composite control) {
 		//Data Type group
@@ -123,7 +136,9 @@ public class DataTypesPreferencePage extends DataModelsPreferencePage {
 
 	/**
 	 * Create Attributes Ui Elements
-	 * @param parent Composite parent
+	 * 
+	 * @param parent
+	 *        Composite parent
 	 */
 	protected void createAttribuesUi(Composite parent) {
 		//Table Viewer
@@ -146,10 +161,10 @@ public class DataTypesPreferencePage extends DataModelsPreferencePage {
 
 			@Override
 			public String getText(Object element) {
-				if(element instanceof RequirementTypeAttribute) {
-					return ((RequirementTypeAttribute)element).getName();
-				} else if(element instanceof EnumeratorType) {
-					return ((EnumeratorType)element).getName();
+				if(element instanceof IAttribute) {
+					return ((IAttribute)element).getName();
+				} else if(element instanceof IEnumerator) {
+					return ((IEnumerator)element).getName();
 				}
 				return super.getText(element);
 			}
@@ -161,19 +176,10 @@ public class DataTypesPreferencePage extends DataModelsPreferencePage {
 
 			@Override
 			public String getText(Object element) {
-				if(element instanceof RequirementTypeAttribute) {
-					EDataType type = ((RequirementTypeAttribute)element).getType();
-					String name = type.getName();
-					String nsURI = type.getEPackage().getNsURI();
-					if(EcorePackage.eNS_URI.equals(nsURI) && name.startsWith("E")) {
-						name = name.replaceFirst("E", "");
-					}
-					return name;
+				if(element instanceof IAttribute) {
+					return ((IAttribute)element).getAttributeType().getName();
 				}
-				if(element instanceof EnumeratorType) {
-					return "-";
-				}
-				return super.getText(element);
+				return "";
 			}
 		});
 		attributeTVLayout.setColumnData(tvcAttributesTypes.getColumn(), new ColumnWeightData(20, 100, true));
@@ -183,21 +189,23 @@ public class DataTypesPreferencePage extends DataModelsPreferencePage {
 		Composite btnComposite = new Composite(parent, SWT.None);
 		btnComposite.setLayout(new GridLayout());
 		btnComposite.setLayoutData(new GridData(SWT.FILL, SWT.FILL, false, true));
-		
+
 		btnAddAttribute = PreferenceUiUtil.createButton(btnComposite, "Add Attribute", Activator.getImageDescriptor("/icons/add.gif").createImage());
 		btnAddAttribute.setEnabled(false);
-		
+
 		btnEditAttribute = PreferenceUiUtil.createButton(btnComposite, "Edit Attribute", Activator.getImageDescriptor("/icons/edit.png").createImage());
 		btnEditAttribute.setEnabled(false);
-		
+
 		btnDeleteAttribute = PreferenceUiUtil.createButton(btnComposite, "Delete Attribute", Activator.getImageDescriptor("/icons/delete.gif").createImage());
 		btnDeleteAttribute.setEnabled(false);
 	}
 
-	
-	/** 
+
+	/**
 	 * Create Types Attributes
-	 * @param parent Composite parent
+	 * 
+	 * @param parent
+	 *        Composite parent
 	 */
 	protected void createTypesUi(Composite parent) {
 		//Table viewer
@@ -221,9 +229,15 @@ public class DataTypesPreferencePage extends DataModelsPreferencePage {
 
 			@Override
 			public String getText(Object element) {
-				if(element instanceof DataType) {
-					return ((DataType)element).getName();
+
+				if(element instanceof IRequirementType) {
+					return ((IRequirementType)element).getName();
 				}
+
+				if(element instanceof IEnumerationType) {
+					return ((IEnumerationType)element).getName();
+				}
+
 				return super.getText(element);
 			}
 		});
@@ -234,27 +248,27 @@ public class DataTypesPreferencePage extends DataModelsPreferencePage {
 
 			@Override
 			public String getText(Object element) {
-				if(element instanceof EnumerationType) {
+				if(element instanceof IEnumerationType) {
 					return "Enumeration";
 				} else {
 					return "Requirement";
 				}
 			}
 		});
-		typesTVLayout.setColumnData(tvcTypesTypes.getColumn(), new ColumnWeightData(20, 200, true));
+		typesTVLayout.setColumnData(tvcTypesTypes.getColumn(), new ColumnWeightData(20, 100, true));
 
 		tvTypes.setInput(inputTypes);
 
 		Composite btnComposite = new Composite(parent, SWT.None);
 		btnComposite.setLayout(new GridLayout());
 		btnComposite.setLayoutData(new GridData(SWT.FILL, SWT.FILL, false, true));
-		
+
 		btnAddType = PreferenceUiUtil.createButton(btnComposite, "Add Data Type", Activator.getImageDescriptor("/icons/add.gif").createImage());
 		btnAddType.setEnabled(false);
-		
+
 		btnEditType = PreferenceUiUtil.createButton(btnComposite, "Edit Data Type", Activator.getImageDescriptor("/icons/edit.png").createImage());
 		btnEditType.setEnabled(false);
-		
+
 		btnDeleteType = PreferenceUiUtil.createButton(btnComposite, "Delete Data Type", Activator.getImageDescriptor("/icons/delete.gif").createImage());
 		btnDeleteType.setEnabled(false);
 	}
@@ -263,7 +277,7 @@ public class DataTypesPreferencePage extends DataModelsPreferencePage {
 	public void hookListeners() {
 
 		super.hookListeners();
-		
+
 		tvModels.addSelectionChangedListener(new ISelectionChangedListener() {
 
 			@Override
@@ -276,11 +290,11 @@ public class DataTypesPreferencePage extends DataModelsPreferencePage {
 				ISelection selection = event.getSelection();
 				if(selection instanceof IStructuredSelection) {
 					Object obj = ((IStructuredSelection)selection).getFirstElement();
-					if(obj instanceof DataModel) {
-						selectedModel = (DataModel)obj;
+					if(obj instanceof IDataModel) {
+						selectedModel = (IDataModel)obj;
 						btnAddType.setEnabled(true);
-						inputTypes.addAll(dataModelManager.getDataTypes(selectedModel));
-						inputTypes.addAll(dataModelManager.getEnumerationTypes(selectedModel));
+						inputTypes.addAll(selectedModel.getRequirementTypes());
+						inputTypes.addAll(selectedModel.getEnumerationTypes());
 					}
 				}
 				tvTypes.refresh();
@@ -298,11 +312,27 @@ public class DataTypesPreferencePage extends DataModelsPreferencePage {
 				ISelection selection = event.getSelection();
 				if(selection instanceof IStructuredSelection) {
 					Object obj = ((IStructuredSelection)selection).getFirstElement();
-					if(obj instanceof DataType) {
-						selectedType = (DataType)obj;
-						inputAttributes.addAll(selectedType.getAttributes());
-						btnAddAttribute.setEnabled(true);
+					selectedType = obj;
+					if(obj instanceof IRequirementType) {
+						inputAttributes.addAll(((IRequirementType)obj).getAttributes());
+						if(!tvcAttributesTypes.getColumn().getResizable()) {
+
+							int width = (tvAttributes.getTable().getBounds().width) / 2;
+
+							tvcAttributesTypes.getColumn().setWidth(width - tvAttributes.getTable().getBorderWidth());
+							tvcAttributesTypes.getColumn().setResizable(true);
+							tvcAttributesNames.getColumn().setWidth(width - tvAttributes.getTable().getBorderWidth());
+						}
 					}
+					if(obj instanceof IEnumerationType) {
+						inputAttributes.addAll(((IEnumerationType)obj).getEnumerators());
+						if(tvcAttributesTypes.getColumn().getResizable()) {
+							tvcAttributesTypes.getColumn().setWidth(0);
+							tvcAttributesTypes.getColumn().setResizable(false);
+							tvcAttributesNames.getColumn().setWidth(tvAttributes.getTable().getBounds().width - tvAttributes.getTable().getBorderWidth() * 2);
+						}
+					}
+					btnAddAttribute.setEnabled(true);
 				}
 				tvAttributes.refresh();
 			}
@@ -317,19 +347,19 @@ public class DataTypesPreferencePage extends DataModelsPreferencePage {
 				if(dialog.open() == Window.OK) {
 					String name = dialog.getName();
 					boolean isReq = dialog.isRequirement();
-					DataType element;
+					Object element;
 
 					if(isReq) {
-						element = dataModelManager.createRequirementType(name);
+						element = dataModelManager.createRequirementType(name, selectedModel);
+						selectedModel.addRequirementType((IRequirementType)element);
 					} else {
 						element = dataModelManager.createEnumerationType(name);
+						selectedModel.addEnumerationType((IEnumerationType)element);
 					}
-
-					dataModelManager.addDataTypes(selectedModel, element);
 
 					inputTypes.add(element);
 					tvTypes.refresh();
-
+					dirty = true;
 				}
 			}
 		});
@@ -339,43 +369,48 @@ public class DataTypesPreferencePage extends DataModelsPreferencePage {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
 
-				DataTypeAttribute attribute = null;
+				Object attribute = null;
 
-				if(selectedType instanceof EnumerationType) {
+				if(selectedType instanceof IEnumerationType) {
 
 					NameDialog dialog = new NameDialog(e.display.getActiveShell(), "Add Enumeration Value");
 					if(dialog.open() == Window.OK) {
-						attribute = dataModelManager.createEnumeratorType(dialog.getName());
-						((EnumerationType)selectedType).addEnumeratorType((EnumeratorType)attribute);
+						attribute = dataModelManager.createEnumerator(dialog.getName());
+						((IEnumerationType)selectedType).addEnumerator((IEnumerator)attribute);
 					}
 
-				} else if(selectedType instanceof RequirementType) {
+				} else if(selectedType instanceof IRequirementType) {
 
-					Set<EDataType> values = new HashSet<EDataType>();
+					Set<IAttributeType> values = new HashSet<IAttributeType>();
 					values.addAll(DataUtil.eDataTypes);
-					Collection<EnumerationType> enumerations = dataModelManager.getEnumerationTypes(selectedModel);
-					values.addAll(Collections2.transform(enumerations, new Function<EnumerationType, EDataType>() {
+					Collection<IEnumerationType> enumerations = selectedModel.getEnumerationTypes();
+					values.addAll(Collections2.transform(enumerations, new Function<IEnumerationType, IAttributeType>() {
 
 						@Override
-						public EDataType apply(EnumerationType arg0) {
-							return arg0.getEDataType();
+						public IAttributeType apply(IEnumerationType arg0) {
+							IAttributeType attributeType = null;
+							if(arg0 instanceof IAdaptable) {
+								attributeType = (IAttributeType)((IAdaptable)arg0).getAdapter(IAttributeType.class);
+							}
+							return attributeType;
 						}
 					}));
-					Collection<EDataType> types = Collections2.filter(values, Predicates.notNull());
+
+					Collection<IAttributeType> types = Collections2.filter(values, Predicates.notNull());
 
 					AddAttributeDialog dialog = new AddAttributeDialog(e.display.getActiveShell(), "Add Attribute", types);
 
 					if(Window.OK == dialog.open()) {
-
 						String name = dialog.getName();
-						EDataType type = dialog.getType();
-						attribute = dataModelManager.createAttributeType(name, type);
-						((RequirementType)selectedType).addAttributeType((RequirementTypeAttribute)attribute);
+						IAttributeType type = dialog.getType();
+						attribute = dataModelManager.createAttribute(name, type);
+						((IRequirementType)selectedType).addAttributeType((IAttribute)attribute);
 					}
 				}
 				if(attribute != null) {
 					inputAttributes.add(attribute);
 					tvAttributes.refresh();
+					dirty = true;
 				}
 
 			}
@@ -383,4 +418,14 @@ public class DataTypesPreferencePage extends DataModelsPreferencePage {
 		});
 	}
 
+	@Override
+	public boolean performOk() {
+		boolean result = super.performOk();
+		if(dirty) {
+			MessageDialog.openWarning(getShell(), "Eclipse Restart", "Please relaunch Eclipse to use newly added Requirements types and attributes");
+			dirty = false;
+		}
+
+		return result;
+	}
 }

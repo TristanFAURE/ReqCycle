@@ -6,6 +6,7 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.regex.Pattern;
@@ -45,32 +46,9 @@ public class ReachableManager implements IReachableManager {
 	private List<IHandler> handlers = new ArrayList<IHandler>();
 	IExtensionRegistry registry = Platform.getExtensionRegistry();
 	Cache<Object, IObjectHandler> cacheObjects = BUILDER
-			.build(new CacheLoader<Object, IObjectHandler>() {
-
-				@Override
-				public IObjectHandler load(Object o) throws Exception {
-					for (IObjectHandler h : Iterables.filter(handlers,
-							IObjectHandler.class)) {
-						if (h.handlesObject(o)) {
-							return h;
-						}
-					}
-					throw new Exception();
-				}
-			});
+			.build();
 	Cache<Reachable, IReachableHandler> cacheReachables = BUILDER
-			.build(new CacheLoader<Reachable, IReachableHandler>() {
-				@Override
-				public IReachableHandler load(Reachable t) throws Exception {
-					for (IReachableHandler h : Iterables.filter(handlers,
-							IReachableHandler.class)) {
-						if (h.handlesReachable(t)) {
-							return h;
-						}
-					}
-					throw new Exception();
-				}
-			});
+			.build();
 
 	@PostConstruct
 	public void postConstruct() {
@@ -115,12 +93,28 @@ public class ReachableManager implements IReachableManager {
 	}
 
 	@Override
-	public IReachableHandler getHandlerFromReachable(Reachable t)
+	public IReachableHandler getHandlerFromReachable(final Reachable t)
 			throws IReachableHandlerException {
 		IReachableHandler get;
 		try {
-			get = cacheReachables.get(t);
+			get = cacheReachables.get(t,new Callable<IReachableHandler>() {
+
+				@Override
+				public IReachableHandler call() throws Exception {
+					
+					for (IReachableHandler h : Iterables.filter(handlers,
+							IReachableHandler.class)) {
+						if (h.handlesReachable(t)) {
+							return h;
+						}
+					}
+					throw new Exception();
+					
+					
+				}
+			});
 		} catch (ExecutionException e) {
+			e.printStackTrace();
 			throw new IReachableHandlerException();
 		}
 		if (get == null) {
@@ -130,14 +124,26 @@ public class ReachableManager implements IReachableManager {
 	}
 
 	@Override
-	public IObjectHandler getHandlerFromObject(Object o)
+	public IObjectHandler getHandlerFromObject(final Object o)
 			throws IReachableHandlerException {
 		if (o == null) {
 			throw new IReachableHandlerException();
 		}
 		IObjectHandler get;
 		try {
-			get = cacheObjects.get(o);
+			get = cacheObjects.get(o, new Callable<IObjectHandler>() {
+
+				@Override
+				public IObjectHandler call() throws Exception {
+					for (IObjectHandler h : Iterables.filter(handlers,
+						IObjectHandler.class)) {
+					if (h.handlesObject(o)) {
+						return h;
+					}
+				}
+				throw new Exception();
+				}
+			});
 		} catch (ExecutionException e) {
 			throw new IReachableHandlerException();
 		}

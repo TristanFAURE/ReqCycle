@@ -8,16 +8,16 @@
     importOrganizing="true">
   <foreignModel>MappingModel.ecore</foreignModel>
   <genPackages prefix="MappingModel" disposableProviderFactory="true" ecorePackage="MappingModel.ecore#/">
-    <genClasses ecoreClass="MappingModel.ecore#//ElementMapping">
-      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute MappingModel.ecore#//ElementMapping/description"/>
-      <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference MappingModel.ecore#//ElementMapping/targetElement"/>
-      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference MappingModel.ecore#//ElementMapping/attributes"/>
-      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute MappingModel.ecore#//ElementMapping/sourceQualifier"/>
+    <genClasses ecoreClass="MappingModel.ecore#//MappingElement">
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute MappingModel.ecore#//MappingElement/description"/>
+      <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference MappingModel.ecore#//MappingElement/targetElement"/>
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference MappingModel.ecore#//MappingElement/attributes"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute MappingModel.ecore#//MappingElement/sourceQualifier"/>
     </genClasses>
-    <genClasses ecoreClass="MappingModel.ecore#//AttributeMapping">
-      <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference MappingModel.ecore#//AttributeMapping/targetAttribute"/>
-      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute MappingModel.ecore#//AttributeMapping/description"/>
-      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute MappingModel.ecore#//AttributeMapping/sourceId"/>
+    <genClasses ecoreClass="MappingModel.ecore#//MappingAttribute">
+      <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference MappingModel.ecore#//MappingAttribute/targetAttribute"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute MappingModel.ecore#//MappingAttribute/description"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute MappingModel.ecore#//MappingAttribute/sourceId"/>
     </genClasses>
   </genPackages>
 </genmodel:GenModel>

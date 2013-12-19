@@ -20,6 +20,11 @@
             interface="org.eclipse.reqcycle.traceability.storage.blueprints.graph.IGraphProvider"
             priority="100">
       </binding>
+      <binding
+            impl="org.eclipse.reqcycle.sesame.graph.RDFGraphStorageProvider"
+            interface="org.eclipse.reqcycle.traceability.storage.IOneFileStorageProvider"
+            name="RDF">
+      </binding>
    </extension>
    <extension
          point="org.eclipse.reqcycle.uri.reachableHandler">

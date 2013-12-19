@@ -18,18 +18,18 @@
    </extension>
 
    <extension point="org.eclipse.emf.ecore.generated_package">
-      <!-- @generated RequirementSourcesConf -->
+      <!-- @generated RequirementSourceConf -->
       <package
-            uri="http://www.eclipse.org/ReqCycle/RequirementSourcesConf"
-            class="RequirementSourcesConf.RequirementSourcesConfPackage"
-            genModel="model/RequirementSourcesConf.genmodel"/>
+            uri="http://www.eclipse.org/ReqCycle/RequirementSourceConf"
+            class="RequirementSourceConf.RequirementSourceConfPackage"
+            genModel="model/RequirementSourceConf.genmodel"/>
    </extension>
 
    <extension point="org.eclipse.emf.ecore.extension_parser">
-      <!-- @generated RequirementSourcesConf -->
+      <!-- @generated RequirementSourceConf -->
       <parser
-            type="requirementsourcesconf"
-            class="RequirementSourcesConf.util.RequirementSourcesConfResourceFactoryImpl"/>
+            type="data"
+            class="RequirementSourceConf.util.RequirementSourceConfResourceFactoryImpl"/>
    </extension>
 
 </plugin>

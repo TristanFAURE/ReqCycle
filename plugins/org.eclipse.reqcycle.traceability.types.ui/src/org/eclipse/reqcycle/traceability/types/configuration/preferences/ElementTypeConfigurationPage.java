@@ -21,6 +21,8 @@ import org.eclipse.ziggurat.inject.ZigguratInject;
 
 public class ElementTypeConfigurationPage extends AbstractPreferencePage {
 
+	private PreferenceDialogTypesContentProvider preferenceDialogTypesContentProvider;
+
 	@Override
 	protected void addAction() {
 		if (treeViewer.getSelection() instanceof IStructuredSelection) {
@@ -59,7 +61,7 @@ public class ElementTypeConfigurationPage extends AbstractPreferencePage {
 
 	@Override
 	protected IContentProvider getContentProvider() {
-		PreferenceDialogTypesContentProvider preferenceDialogTypesContentProvider = new PreferenceDialogTypesContentProvider(
+		preferenceDialogTypesContentProvider = new PreferenceDialogTypesContentProvider(
 				factory, container);
 		ZigguratInject.inject(preferenceDialogTypesContentProvider);
 		return preferenceDialogTypesContentProvider;
@@ -97,6 +99,9 @@ public class ElementTypeConfigurationPage extends AbstractPreferencePage {
 
 	@Override
 	protected void setInput() {
+		if(preferenceDialogTypesContentProvider != null) {
+			preferenceDialogTypesContentProvider.setTypeConfigContainer(container);
+		}
 		treeViewer.setInput(container.eResource());
 	}
 

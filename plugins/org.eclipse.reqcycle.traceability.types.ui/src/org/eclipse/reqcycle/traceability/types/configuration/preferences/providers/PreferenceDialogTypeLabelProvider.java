@@ -41,7 +41,7 @@ public class PreferenceDialogTypeLabelProvider extends
 		}
 		return text;
 	}
-
+	
 	@Override
 	public Image getImage(Object element) {
 		String typeId = null;

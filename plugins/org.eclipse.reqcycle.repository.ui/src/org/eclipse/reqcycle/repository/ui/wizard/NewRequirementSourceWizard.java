@@ -11,10 +11,6 @@
  *  Anass RADOUANI (AtoS) anass.radouani@atos.net - Initial API and implementation
  *
  *****************************************************************************/
-
-/**
- * 
- */
 package org.eclipse.reqcycle.repository.ui.wizard;
 
 import java.util.concurrent.Callable;
@@ -27,13 +23,13 @@ import org.eclipse.jface.wizard.Wizard;
 import org.eclipse.reqcycle.repository.connector.ConnectorDescriptor;
 import org.eclipse.reqcycle.repository.connector.IConnector;
 import org.eclipse.reqcycle.repository.connector.ui.wizard.IConnectorWizard;
-import org.eclipse.reqcycle.repository.data.IRequirementSourceManager;
+import org.eclipse.reqcycle.repository.data.IDataManager;
 import org.eclipse.reqcycle.repository.ui.wizard.pages.SelectConnectorPage;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchWizard;
 import org.eclipse.ziggurat.inject.ZigguratInject;
 
-import DataModel.RequirementSource;
+import RequirementSourceConf.RequirementSource;
 
 public class NewRequirementSourceWizard extends Wizard implements IWorkbenchWizard {
 
@@ -45,14 +41,14 @@ public class NewRequirementSourceWizard extends Wizard implements IWorkbenchWiza
 	private IStructuredSelection selection;
 
 	@Inject
-	IRequirementSourceManager requirementSourceManager;
+	IDataManager requirementSourceManager;
 
 	@Inject
-	public NewRequirementSourceWizard(IRequirementSourceManager requirementSourceManager) {
+	public NewRequirementSourceWizard(IDataManager requirementSourceManager) {
 		this();
 		this.requirementSourceManager = requirementSourceManager;
 	}
-	
+
 	public NewRequirementSourceWizard() {
 		setForcePreviousAndNextButtons(true);
 		setNeedsProgressMonitor(true);
@@ -66,13 +62,13 @@ public class NewRequirementSourceWizard extends Wizard implements IWorkbenchWiza
 		addPage(selectConnectorPage);
 	}
 
-	private IRequirementSourceManager getRequirementSourceManager() {
+	private IDataManager getRequirementSourceManager() {
 		if(requirementSourceManager == null) {
-			requirementSourceManager =  ZigguratInject.make(IRequirementSourceManager.class);
+			requirementSourceManager = ZigguratInject.make(IDataManager.class);
 		}
 		return requirementSourceManager;
 	}
-	
+
 	@Override
 	public boolean performFinish() {
 		IConnector connector = getConnector();
@@ -86,7 +82,7 @@ public class NewRequirementSourceWizard extends Wizard implements IWorkbenchWiza
 		if(createRequirementSource == null) {
 			//FIXME : Exception
 		}
-		
+
 		RequirementSource source;
 		try {
 			source = createRequirementSource.call();
@@ -94,13 +90,13 @@ public class NewRequirementSourceWizard extends Wizard implements IWorkbenchWiza
 			source.setConnectorId(connectorDescriptor.getId());
 			String sourceName = getSourceName();
 			source.setName(sourceName);
-			getRequirementSourceManager().addRepository(source);
+			getRequirementSourceManager().addRequirementSource(source);
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		
-		
+
+
 		return createRequirementSource != null;
 	}
 

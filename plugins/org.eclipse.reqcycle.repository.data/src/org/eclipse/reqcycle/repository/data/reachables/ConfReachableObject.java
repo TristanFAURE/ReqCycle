@@ -13,10 +13,11 @@ public class ConfReachableObject extends EMFReachableObject {
 	public ConfReachableObject(Reachable t) {
 		super(t);
 	}
-	
+
 	@Override
 	protected EMFVisitable doGetVisitable(URI uri) {
-		return new EMFVisitable(uri){
+		return new EMFVisitable(uri) {
+
 			@Override
 			protected ResourceSet getResourceSet() {
 				return EMFUtils.getFAURSWithPathMaps();

@@ -1,5 +1,8 @@
 package org.eclipse.reqcycle.sesame.graph;
 
+import static com.google.common.collect.Iterables.filter;
+import static com.google.common.collect.Iterables.transform;
+
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.HashMap;
@@ -13,7 +16,7 @@ import java.util.Set;
 import javax.inject.Inject;
 
 import org.eclipse.reqcycle.traceability.model.TType;
-import org.eclipse.reqcycle.traceability.storage.blueprints.graph.ISpecificGraphProvider;
+import org.eclipse.reqcycle.traceability.storage.blueprints.graph.IBusinessOperationProvider;
 import org.eclipse.reqcycle.traceability.utils.SerializationUtils;
 import org.eclipse.reqcycle.uri.IReachableCreator;
 import org.eclipse.reqcycle.uri.model.Reachable;
@@ -26,11 +29,8 @@ import com.tinkerpop.blueprints.Edge;
 import com.tinkerpop.blueprints.Graph;
 import com.tinkerpop.blueprints.Vertex;
 
-import static com.google.common.collect.Iterables.filter;
-import static com.google.common.collect.Iterables.transform;
-
 public class SailBusinessOperations implements
-		ISpecificGraphProvider.IBusinessOperations {
+		IBusinessOperationProvider.IBusinessOperations {
 	private static final String PatternSplitter = "_=@=_";
 	private static final String KIND = "http://kind";
 	// EDGES
@@ -336,34 +336,38 @@ public class SailBusinessOperations implements
 		Vertex targetVertex = getVertex(graph, target);
 		Set<Edge> toDelete = new HashSet<Edge>();
 		delete(targetVertex, sourceVertex, VERTEX_OUTGOING, TRACE_TARGET,
-				toDelete, true);
+				toDelete, true, kind);
 		delete(sourceVertex, targetVertex, VERTEX_INCOMING, TRACE_SOURCE,
-				toDelete, false);
+				toDelete, false, kind);
 		for (Edge e : toDelete) {
 			graph.removeEdge(e);
 		}
 	}
 
 	private void delete(Vertex target, Vertex sourceVertex, String vertex2Trac,
-			String trac2vertex, Set<Edge> toDelete, boolean deleteTraceaEdges) {
+			String trac2vertex, Set<Edge> toDelete, boolean deleteTraceaEdges, TType kind) {
 		Direction directionEdge = Direction.IN;
 		Direction directionVertex = Direction.OUT;
 		if (sourceVertex != null) {
 			for (Edge e : sourceVertex.getEdges(directionVertex, vertex2Trac)) {
 				Vertex tracVertex = e.getVertex(directionEdge);
-				for (Edge e2 : tracVertex
-						.getEdges(directionVertex, trac2vertex)) {
+				if (!kind.equals(getKind(tracVertex)))
+					continue;
+				Iterable<Edge> edges = tracVertex
+						.getEdges(directionVertex, trac2vertex);
+				int size = Iterables.size(edges);
+				for (Edge e2 : edges) {
 					Vertex targetVertex = e2.getVertex(directionEdge);
 					if (targetVertex != null
 							&& targetVertex.getId().equals(target.getId())) {
 						toDelete.add(e);
 						toDelete.add(e2);
-					}
-				}
-				if (deleteTraceaEdges) {
-					for (Edge etmp : tracVertex.getEdges(Direction.BOTH,
-							new String[] {})) {
-						toDelete.add(etmp);
+						if (deleteTraceaEdges) {
+							for(Edge etmp : tracVertex.getEdges(Direction.BOTH,
+								new String[] {})) {
+								toDelete.add(etmp);
+							}
+						}
 					}
 				}
 			}

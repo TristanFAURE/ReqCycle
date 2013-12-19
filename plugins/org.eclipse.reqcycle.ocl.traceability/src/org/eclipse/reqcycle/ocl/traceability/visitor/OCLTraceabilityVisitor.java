@@ -54,7 +54,7 @@ public class OCLTraceabilityVisitor implements IVisitor {
 			if(uri != null && uri.fileExtension() != null && uri.fileExtension().equals("uml")) {
 				IStatus initializationStatus = initializeOCLEvaluator(uri);
 				if(!initializationStatus.isOK()) {
-					StatusManager.getManager().handle(initializationStatus, StatusManager.SHOW | StatusManager.LOG);
+					StatusManager.getManager().handle(initializationStatus, StatusManager.LOG);
 					return false;
 				}
 				go(resource, callBack);

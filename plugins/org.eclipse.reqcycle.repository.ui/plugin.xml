@@ -27,10 +27,10 @@
       <view
             allowMultiple="true"
             category="org.eclipse.reqcycle"
-            class="org.eclipse.reqcycle.repository.ui.views.ScopeView"
+            class="org.eclipse.reqcycle.repository.ui.views.RequirementScopeView"
             icon="icons/open.png"
             id="org.eclipse.reqcycle.repository.ui.views.requirement.scope"
-            name="Scope"
+            name="Requirement Scope"
             restorable="true">
       </view>
    </extension>

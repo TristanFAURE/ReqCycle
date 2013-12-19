@@ -22,6 +22,7 @@ import com.tinkerpop.blueprints.Vertex;
 public class SesameHandler implements IObjectHandler, IReachableHandler {
 
 	SailBusinessOperations op = null;
+
 	@Inject
 	IReachableCreator creator;
 
@@ -34,25 +35,21 @@ public class SesameHandler implements IObjectHandler, IReachableHandler {
 	@Override
 	public ReachableObject getFromObject(Object object) {
 		ReachableObject result = null;
-		if (object instanceof Vertex) {
-			Vertex vertext = (Vertex) object;
-			if (vertext.getId() instanceof String) {
+		if(object instanceof Vertex) {
+			Vertex vertext = (Vertex)object;
+			if(vertext.getId() instanceof String) {
 				result = new SesameReachableObject(op.getReachable(vertext), op);
 			}
-		} else if (object instanceof File) {
-			result = new SesameReachableObject(creator.getReachable(
-					((File) object).toURI(), object), op);
-		} else if (object instanceof IFile) {
+		} else if(object instanceof File) {
+			result = new SesameReachableObject(creator.getReachable(((File)object).toURI(), object), op);
+		} else if(object instanceof IFile) {
 			try {
-				result = new SesameReachableObject(creator.getReachable(
-						new URI("platform:"
-								+ ((IFile) object).getFullPath().toString()),
-						object), op);
+				result = new SesameReachableObject(creator.getReachable(new URI("platform:" + ((IFile)object).getFullPath().toString()), object), op);
 			} catch (URISyntaxException e) {
 				e.printStackTrace();
 			}
 		}
-		if (result != null) {
+		if(result != null) {
 			ZigguratInject.inject(result);
 		}
 		return result;
@@ -60,30 +57,26 @@ public class SesameHandler implements IObjectHandler, IReachableHandler {
 
 	@Override
 	public boolean handlesObject(Object object) {
-		if (object instanceof Vertex) {
+		if(object instanceof Vertex) {
 			return true;
-		} else if (object instanceof File) {
-			return RDFWriterRegistry.getInstance().getFileFormatForFileName(
-					((File) object).getName()) != null;
-		} else if (object instanceof IFile) {
-			return RDFWriterRegistry.getInstance().getFileFormatForFileName(
-					((IFile) object).getName()) != null;
+		} else if(object instanceof File) {
+			return RDFWriterRegistry.getInstance().getFileFormatForFileName(((File)object).getName()) != null;
+		} else if(object instanceof IFile) {
+			return RDFWriterRegistry.getInstance().getFileFormatForFileName(((IFile)object).getName()) != null;
 		}
 		return false;
 	}
 
 	@Override
 	public ReachableObject getFromReachable(Reachable t) {
-		SesameReachableObject sesameReachableObject = new SesameReachableObject(
-				t, op);
+		SesameReachableObject sesameReachableObject = new SesameReachableObject(t, op);
 		ZigguratInject.inject(sesameReachableObject);
 		return sesameReachableObject;
 	}
 
 	@Override
 	public boolean handlesReachable(Reachable t) {
-		return t.getPath() != null && RDFWriterRegistry.getInstance().getFileFormatForFileName(
-				t.getPath()) != null;
+		return t.getPath() != null && ! "reqcycleStd".equals(t.getScheme()) && RDFWriterRegistry.getInstance().getFileFormatForFileName(t.getPath()) != null;
 	}
 
 }

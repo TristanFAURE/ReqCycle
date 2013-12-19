@@ -10,7 +10,7 @@
  * Contributors:
  *  Anass RADOUANI (AtoS) anass.radouani@atos.net - Initial API and implementation
  *
-  *****************************************************************************/
+ *****************************************************************************/
 package org.eclipse.reqcycle.repository.data.ui.preference.pages;
 
 import java.util.ArrayList;
@@ -27,7 +27,7 @@ import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.jface.viewers.TableViewerColumn;
 import org.eclipse.jface.window.Window;
-import org.eclipse.reqcycle.repository.data.types.DataModel;
+import org.eclipse.reqcycle.repository.data.types.IDataModel;
 import org.eclipse.reqcycle.repository.data.ui.Activator;
 import org.eclipse.reqcycle.repository.data.ui.dialog.NameDialog;
 import org.eclipse.reqcycle.repository.data.ui.preference.PreferenceUiUtil;
@@ -41,42 +41,47 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Table;
 
-import DataModel.Scope;
+import ScopeConf.Scope;
 
 public class ScopesPreferencePage extends DataModelsPreferencePage {
+
 	public ScopesPreferencePage() {
 	}
 
 	/** Table Viewer Ui Elements */
 	protected TableViewer tvScopes;
+
 	protected Table tScopes;
+
 	protected TableViewerColumn tvcScopesNames;
-	
+
 	/** Selected Model */
-	protected DataModel selectedModel;
+	protected IDataModel selectedModel;
 
 	/** Scopes Table Input */
 	protected Collection<Scope> inputScopes = new ArrayList<Scope>();
 
 	/** Buttons */
 	protected Button btnAddScope;
+
 	protected Button btnEditScope;
+
 	private Button btnDeleteScope;
-	
+
 	@Override
 	protected void performDefaults() {
 		super.performDefaults();
-		
+
 		if(inputScopes != null) {
 			inputScopes.clear();
 		}
-		
+
 		if(tvScopes != null) {
 			tvScopes.refresh();
 		}
 	}
-	
-	
+
+
 	@Override
 	public void doCreateContents(Composite control) {
 		Group scopesGrp = PreferenceUiUtil.createGroup(control, "Scopes");
@@ -86,36 +91,37 @@ public class ScopesPreferencePage extends DataModelsPreferencePage {
 	@Override
 	public void hookListeners() {
 		super.hookListeners();
-		
+
 		tvModels.addSelectionChangedListener(new ISelectionChangedListener() {
-			
+
 			@Override
 			public void selectionChanged(SelectionChangedEvent event) {
 				btnAddScope.setEnabled(false);
 				inputScopes.clear();
-				
+
 				ISelection selection = event.getSelection();
 				if(selection instanceof IStructuredSelection) {
 					Object obj = ((IStructuredSelection)selection).getFirstElement();
-					if(obj instanceof DataModel) {
-						selectedModel = (DataModel)obj;
+					if(obj instanceof IDataModel) {
+						selectedModel = (IDataModel)obj;
 						btnAddScope.setEnabled(true);
-						inputScopes.addAll(selectedModel.getScopes());
+						inputScopes.addAll(dataModelManager.getScopes(selectedModel));
 					}
-					
+
 				}
-				
+
 				tvScopes.refresh();
 			}
 		});
-		
+
 		btnAddScope.addSelectionListener(new SelectionAdapter() {
+
 			@Override
 			public void widgetSelected(SelectionEvent e) {
 				NameDialog dialog = new NameDialog(e.display.getActiveShell(), "Add Scope");
 				if(dialog.open() == Window.OK) {
 					String name = dialog.getName();
-					Scope scope = dataModelManager.createScope(name);
+					Scope scope = dataModelManager.createScope(name, selectedModel);
 					dataModelManager.addScopes(selectedModel, scope);
 					inputScopes.add(scope);
 					tvScopes.setInput(inputScopes);
@@ -123,12 +129,14 @@ public class ScopesPreferencePage extends DataModelsPreferencePage {
 				}
 			}
 		});
-		
+
 	}
 
 	/**
 	 * Creates Scope Ui
-	 * @param parent Prent Composite
+	 * 
+	 * @param parent
+	 *        Prent Composite
 	 */
 	protected void createScopesUi(Group parent) {
 		//Table Viewer
@@ -156,7 +164,7 @@ public class ScopesPreferencePage extends DataModelsPreferencePage {
 			}
 		});
 		dataTypeTVLayout.setColumnData(tvcScopesNames.getColumn(), new ColumnWeightData(20, 100, true));
-		
+
 		tvScopes.setInput(inputScopes);
 
 		Composite btnComposite = new Composite(parent, SWT.None);
@@ -165,10 +173,10 @@ public class ScopesPreferencePage extends DataModelsPreferencePage {
 
 		btnAddScope = PreferenceUiUtil.createButton(btnComposite, "Add Scope", Activator.getImageDescriptor("/icons/add.gif").createImage());
 		btnAddScope.setEnabled(false);
-		
+
 		btnEditScope = PreferenceUiUtil.createButton(btnComposite, "Edit Scope", Activator.getImageDescriptor("/icons/edit.png").createImage());
 		btnEditScope.setEnabled(false);
-		
+
 		btnDeleteScope = PreferenceUiUtil.createButton(btnComposite, "Delete Scope", Activator.getImageDescriptor("/icons/delete.gif").createImage());
 		btnDeleteScope.setEnabled(false);
 	}

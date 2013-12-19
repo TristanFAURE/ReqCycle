@@ -23,7 +23,19 @@ public interface IInjectedTypeChecker extends ITypeChecker {
 	@Retention(RetentionPolicy.RUNTIME)
 	@Target(ElementType.FIELD)
 	public @interface InjectValue {
-
+	}
+	
+	/**
+	 * Annotation to put on fields where element name shall be injected
+	 * 
+	 * @author aradouan
+	 * 
+	 */
+	@Retention(RetentionPolicy.RUNTIME)
+	@Target(ElementType.FIELD)
+	public @interface InjectValueName {
+		//Element type
+		Class<?> type();
 	}
 
 }

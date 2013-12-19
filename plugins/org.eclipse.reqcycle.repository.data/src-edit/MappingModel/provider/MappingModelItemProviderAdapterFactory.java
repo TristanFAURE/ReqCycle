@@ -29,13 +29,16 @@ import MappingModel.util.MappingModelAdapterFactory;
  * Note that most of the adapters are shared among multiple instances.
  * <!-- begin-user-doc -->
  * <!-- end-user-doc -->
+ * 
  * @generated
  */
 public class MappingModelItemProviderAdapterFactory extends MappingModelAdapterFactory implements ComposeableAdapterFactory, IChangeNotifier, IDisposable {
+
 	/**
 	 * This keeps track of the root adapter factory that delegates to this adapter factory.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	protected ComposedAdapterFactory parentAdapterFactory;
@@ -44,6 +47,7 @@ public class MappingModelItemProviderAdapterFactory extends MappingModelAdapterF
 	 * This is used to implement {@link org.eclipse.emf.edit.provider.IChangeNotifier}.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	protected IChangeNotifier changeNotifier = new ChangeNotifier();
@@ -52,6 +56,7 @@ public class MappingModelItemProviderAdapterFactory extends MappingModelAdapterF
 	 * This keeps track of all the supported types checked by {@link #isFactoryForType isFactoryForType}.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	protected Collection<Object> supportedTypes = new ArrayList<Object>();
@@ -60,6 +65,7 @@ public class MappingModelItemProviderAdapterFactory extends MappingModelAdapterF
 	 * This constructs an instance.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	public MappingModelItemProviderAdapterFactory() {
@@ -71,55 +77,60 @@ public class MappingModelItemProviderAdapterFactory extends MappingModelAdapterF
 	}
 
 	/**
-	 * This keeps track of the one adapter used for all {@link MappingModel.ElementMapping} instances.
+	 * This keeps track of the one adapter used for all {@link MappingModel.MappingElement} instances.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
-	protected ElementMappingItemProvider elementMappingItemProvider;
+	protected MappingElementItemProvider mappingElementItemProvider;
 
 	/**
-	 * This creates an adapter for a {@link MappingModel.ElementMapping}.
+	 * This creates an adapter for a {@link MappingModel.MappingElement}.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	@Override
-	public Adapter createElementMappingAdapter() {
-		if (elementMappingItemProvider == null) {
-			elementMappingItemProvider = new ElementMappingItemProvider(this);
+	public Adapter createMappingElementAdapter() {
+		if(mappingElementItemProvider == null) {
+			mappingElementItemProvider = new MappingElementItemProvider(this);
 		}
 
-		return elementMappingItemProvider;
+		return mappingElementItemProvider;
 	}
 
 	/**
-	 * This keeps track of the one adapter used for all {@link MappingModel.AttributeMapping} instances.
+	 * This keeps track of the one adapter used for all {@link MappingModel.MappingAttribute} instances.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
-	protected AttributeMappingItemProvider attributeMappingItemProvider;
+	protected MappingAttributeItemProvider mappingAttributeItemProvider;
 
 	/**
-	 * This creates an adapter for a {@link MappingModel.AttributeMapping}.
+	 * This creates an adapter for a {@link MappingModel.MappingAttribute}.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	@Override
-	public Adapter createAttributeMappingAdapter() {
-		if (attributeMappingItemProvider == null) {
-			attributeMappingItemProvider = new AttributeMappingItemProvider(this);
+	public Adapter createMappingAttributeAdapter() {
+		if(mappingAttributeItemProvider == null) {
+			mappingAttributeItemProvider = new MappingAttributeItemProvider(this);
 		}
 
-		return attributeMappingItemProvider;
+		return mappingAttributeItemProvider;
 	}
 
 	/**
 	 * This returns the root adapter factory that contains this factory.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	public ComposeableAdapterFactory getRootAdapterFactory() {
@@ -130,6 +141,7 @@ public class MappingModelItemProviderAdapterFactory extends MappingModelAdapterF
 	 * This sets the composed adapter factory that contains this factory.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	public void setParentAdapterFactory(ComposedAdapterFactory parentAdapterFactory) {
@@ -139,6 +151,7 @@ public class MappingModelItemProviderAdapterFactory extends MappingModelAdapterF
 	/**
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	@Override
@@ -150,6 +163,7 @@ public class MappingModelItemProviderAdapterFactory extends MappingModelAdapterF
 	 * This implementation substitutes the factory itself as the key for the adapter.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	@Override
@@ -160,13 +174,14 @@ public class MappingModelItemProviderAdapterFactory extends MappingModelAdapterF
 	/**
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	@Override
 	public Object adapt(Object object, Object type) {
-		if (isFactoryForType(type)) {
+		if(isFactoryForType(type)) {
 			Object adapter = super.adapt(object, type);
-			if (!(type instanceof Class<?>) || (((Class<?>)type).isInstance(adapter))) {
+			if(!(type instanceof Class<?>) || (((Class<?>)type).isInstance(adapter))) {
 				return adapter;
 			}
 		}
@@ -178,6 +193,7 @@ public class MappingModelItemProviderAdapterFactory extends MappingModelAdapterF
 	 * This adds a listener.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	public void addListener(INotifyChangedListener notifyChangedListener) {
@@ -188,6 +204,7 @@ public class MappingModelItemProviderAdapterFactory extends MappingModelAdapterF
 	 * This removes a listener.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	public void removeListener(INotifyChangedListener notifyChangedListener) {
@@ -198,25 +215,29 @@ public class MappingModelItemProviderAdapterFactory extends MappingModelAdapterF
 	 * This delegates to {@link #changeNotifier} and to {@link #parentAdapterFactory}.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	public void fireNotifyChanged(Notification notification) {
 		changeNotifier.fireNotifyChanged(notification);
 
-		if (parentAdapterFactory != null) {
+		if(parentAdapterFactory != null) {
 			parentAdapterFactory.fireNotifyChanged(notification);
 		}
 	}
 
 	/**
-	 * This disposes all of the item providers created by this factory. 
+	 * This disposes all of the item providers created by this factory.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	public void dispose() {
-		if (elementMappingItemProvider != null) elementMappingItemProvider.dispose();
-		if (attributeMappingItemProvider != null) attributeMappingItemProvider.dispose();
+		if(mappingElementItemProvider != null)
+			mappingElementItemProvider.dispose();
+		if(mappingAttributeItemProvider != null)
+			mappingAttributeItemProvider.dispose();
 	}
 
 }

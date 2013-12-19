@@ -19,6 +19,7 @@ import javax.inject.Named;
 
 import org.eclipse.e4.core.di.annotations.Optional;
 import org.eclipse.e4.ui.di.UIEventTopic;
+import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.jface.viewers.TableViewerColumn;
@@ -197,8 +198,10 @@ public class TraceabilityTableView extends ViewPart {
 		ExplicitLinksAction explicitAction = new ExplicitLinksAction(viewer, tableControl);
 		AllLinksAction implicitAction = new AllLinksAction(tableControl);
 		ZigguratInject.inject(explicitAction, implicitAction);
+		RefreshAction refreshViewAction = new RefreshAction(refresher);
 		bars.getToolBarManager().add(explicitAction);
 		bars.getToolBarManager().add(implicitAction);
+		bars.getToolBarManager().add(refreshViewAction);
 	}
 
 	@Override
@@ -292,6 +295,22 @@ public class TraceabilityTableView extends ViewPart {
 		
 	}
 	
+	
+	private final class RefreshAction extends Action {
+		
+		private Refresher refresher;
+
+		public RefreshAction(Refresher refresher) {
+			this.refresher = refresher;
+			setText("Refresh");
+			setToolTipText("Refresh Links list");
+		}
+		
+		@Override
+		public void run() {
+			this.refresher.scheduleRefresh();
+		}
+	}
 
 	public TableController getController() {
 		return this.tableControl;

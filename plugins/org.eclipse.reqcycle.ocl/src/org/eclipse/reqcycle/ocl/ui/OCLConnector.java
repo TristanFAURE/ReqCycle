@@ -17,7 +17,6 @@ import javax.inject.Inject;
 
 import org.eclipse.emf.common.util.TreeIterator;
 import org.eclipse.emf.common.util.URI;
-import org.eclipse.emf.ecore.EAttribute;
 import org.eclipse.emf.ecore.EObject;
 import org.eclipse.emf.ecore.resource.Resource;
 import org.eclipse.emf.ecore.resource.ResourceSet;
@@ -27,27 +26,25 @@ import org.eclipse.jface.wizard.IWizardPage;
 import org.eclipse.jface.wizard.Wizard;
 import org.eclipse.reqcycle.ocl.utils.OCLUtilities;
 import org.eclipse.reqcycle.repository.connector.ui.wizard.IConnectorWizard;
+import org.eclipse.reqcycle.repository.data.IDataManager;
 import org.eclipse.reqcycle.repository.data.IDataModelManager;
-import org.eclipse.reqcycle.repository.data.IRequirementCreator;
-import org.eclipse.reqcycle.repository.data.types.DataModel;
-import org.eclipse.reqcycle.repository.data.types.RequirementType;
-import org.eclipse.reqcycle.repository.data.types.RequirementTypeAttribute;
-import org.eclipse.reqcycle.repository.data.types.internal.RequirementTypeAttributeImpl;
-import org.eclipse.reqcycle.repository.data.util.RepositoryConstants;
+import org.eclipse.reqcycle.repository.data.types.IAttribute;
+import org.eclipse.reqcycle.repository.data.types.IDataModel;
+import org.eclipse.reqcycle.repository.data.types.IRequirementType;
+import org.eclipse.reqcycle.repository.data.util.IRequirementSourceProperties;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Listener;
 import org.eclipse.ziggurat.ocl.OCLEvaluator;
 import org.eclipse.ziggurat.ocl.ZigguratOCLPlugin;
 
-import DataModel.Contained;
-import DataModel.DataModelFactory;
-import DataModel.RequirementSource;
-import DataModel.Scope;
-import MappingModel.ElementMapping;
+import MappingModel.MappingElement;
+import RequirementSourceConf.RequirementSource;
+import RequirementSourceData.AbstractElement;
+import RequirementSourceData.Requirement;
+import ScopeConf.Scope;
 
 import com.google.common.collect.Iterables;
 
-@SuppressWarnings("restriction")
 public class OCLConnector extends Wizard implements IConnectorWizard, Listener {
 
 	protected SettingBean bean = new SettingBean();
@@ -55,10 +52,10 @@ public class OCLConnector extends Wizard implements IConnectorWizard, Listener {
 	private RequirementSource requirementSource = null;
 
 	@Inject
-	IRequirementCreator creator;
+	IDataModelManager manager;
 
 	@Inject
-	IDataModelManager manager;
+	IDataManager dataManager;
 
 	@Override
 	public void addPages() {
@@ -75,71 +72,55 @@ public class OCLConnector extends Wizard implements IConnectorWizard, Listener {
 			public RequirementSource call() throws Exception {
 				RequirementSource result = null;
 
-				if (OCLConnector.this.requirementSource != null) {
+				if(OCLConnector.this.requirementSource != null) {
 					result = OCLConnector.this.requirementSource;
 				} else {
-					result = DataModelFactory.eINSTANCE
-							.createRequirementSource();
+					result = dataManager.createRequirementSource();
 				}
 
-				result.setProperty(RepositoryConstants.PROPERTY_URL,
-						bean.getUri());
+				result.setProperty(IRequirementSourceProperties.PROPERTY_URI, bean.getUri());
 				fillRequirements(result);
 				return result;
 			}
 		};
 	}
 
-	protected void fillRequirements(RequirementSource requirementSource)
-			throws Exception {
-		requirementSource.getRequirements().clear();
-		Collection<ElementMapping> mapping = requirementSource.getMappings();
+	protected void fillRequirements(RequirementSource requirementSource) throws Exception {
+		requirementSource.clearContent();
+		Collection<MappingElement> mapping = requirementSource.getMappings();
 		ResourceSet resourceSet = new ResourceSetImpl();
 
 		String repositoryUri = requirementSource.getRepositoryUri();
 
-		Resource resource = resourceSet.getResource(
-				URI.createPlatformResourceURI(repositoryUri, true), true);
-		OCLEvaluator evaluator = ZigguratOCLPlugin.compileOCL(resourceSet,
-				URI.createPlatformResourceURI(bean.getOclUri(), true));
+		Resource resource = resourceSet.getResource(URI.createPlatformResourceURI(repositoryUri, true), true);
+		OCLEvaluator evaluator = ZigguratOCLPlugin.compileOCL(resourceSet, URI.createPlatformResourceURI(bean.getOclUri(), true));
 
 		TreeIterator<EObject> contents = resource.getAllContents();
-		Collection<RequirementType> requirementTypes = bean.getDataPackage()
-				.getDataTypes();
-		;
-		while (contents.hasNext()) {
+		Collection<IRequirementType> requirementTypes = bean.getDataPackage().getRequirementTypes();
+		while(contents.hasNext()) {
 			EObject eObject = contents.next();
-			for (RequirementType reqType : requirementTypes) {
-				if (OCLUtilities.isDataType(evaluator, eObject,
-						reqType)) {
-					Contained requirement = createRequirement(evaluator,
-							mapping, eObject, reqType);
-					requirementSource.getRequirements().add(requirement);
+			for(IRequirementType reqType : requirementTypes) {
+				if(OCLUtilities.isDataType(evaluator, eObject, reqType)) {
+					AbstractElement requirement = createRequirement(evaluator, mapping, eObject, reqType);
+					dataManager.addElementsToSource(requirementSource, requirement);
 				}
 			}
 		}
 	}
 
-	protected Contained createRequirement(OCLEvaluator evaluator,
-			Collection<ElementMapping> mappings, EObject eObject,
-			RequirementType reqType) throws Exception {
-		Contained contained = (Contained) manager.createInstance(reqType);
-		for (RequirementTypeAttribute attribute : Iterables.filter(
-				reqType.getAttributes(), RequirementTypeAttribute.class)) {
-			Object value = OCLUtilities.getAttributeValue(evaluator,
-					eObject, attribute);
-			if (value != null) {
-				EAttribute eAttribute = ((RequirementTypeAttributeImpl) attribute)
-						.getEAttribute();
-				creator.addAttribute(contained, eAttribute, value);
+	protected AbstractElement createRequirement(OCLEvaluator evaluator, Collection<MappingElement> mappings, EObject eObject, IRequirementType reqType) throws Exception {
+		Requirement requirement = reqType.createInstance();
+		for(IAttribute attribute : Iterables.filter(reqType.getAttributes(), IAttribute.class)) {
+			Object value = OCLUtilities.getAttributeValue(evaluator, eObject, attribute);
+			if(value != null) {
+				dataManager.addAttribute(requirement, attribute, value);
 			}
 		}
-		return contained;
+		return requirement;
 	}
 
 	@Override
-	public void initializeWithRequirementSource(
-			RequirementSource requirementSource) {
+	public void initializeWithRequirementSource(RequirementSource requirementSource) {
 		this.requirementSource = requirementSource;
 	}
 
@@ -154,7 +135,7 @@ public class OCLConnector extends Wizard implements IConnectorWizard, Listener {
 
 		private String oclUri = "";
 
-		private DataModel dataPackage;
+		private IDataModel dataPackage;
 
 		private Scope scope;
 
@@ -179,11 +160,11 @@ public class OCLConnector extends Wizard implements IConnectorWizard, Listener {
 			notifyChange();
 		}
 
-		public DataModel getDataPackage() {
+		public IDataModel getDataPackage() {
 			return dataPackage;
 		}
 
-		public void setDataPackage(DataModel dataPackage) {
+		public void setDataPackage(IDataModel dataPackage) {
 			this.dataPackage = dataPackage;
 			notifyChange();
 		}
@@ -199,12 +180,12 @@ public class OCLConnector extends Wizard implements IConnectorWizard, Listener {
 
 		public void notifyChange() {
 			IWizardPage[] pages = getPages();
-			if (pages != null) {
-				for (int i = 0; i < pages.length; i++) {
+			if(pages != null) {
+				for(int i = 0; i < pages.length; i++) {
 					IWizardPage iWizardPage = pages[i];
 					iWizardPage.getWizard().getContainer().updateButtons();
-					if (iWizardPage instanceof Listener) {
-						((Listener) iWizardPage).handleEvent(new Event());
+					if(iWizardPage instanceof Listener) {
+						((Listener)iWizardPage).handleEvent(new Event());
 					}
 				}
 			}
@@ -213,9 +194,7 @@ public class OCLConnector extends Wizard implements IConnectorWizard, Listener {
 
 	@Override
 	public boolean canFinish() {
-		return bean != null && bean.getOclUri() != null
-				&& bean.getDataPackage() != null && bean.getUri() != null
-				&& !bean.getOclUri().isEmpty() && !bean.getUri().isEmpty();
+		return bean != null && bean.getOclUri() != null && bean.getDataPackage() != null && bean.getUri() != null && !bean.getOclUri().isEmpty() && !bean.getUri().isEmpty();
 	}
 
 	@Override

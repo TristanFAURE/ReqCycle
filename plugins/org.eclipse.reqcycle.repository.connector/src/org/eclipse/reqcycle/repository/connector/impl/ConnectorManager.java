@@ -36,8 +36,6 @@ public class ConnectorManager implements IConnectorManager {
 	/** Connector ID to Connector Descriptor */
 	private Map<String, ConnectorDescriptor> connectors = new HashMap<String, ConnectorDescriptor>();
 
-	/** Logger */
-	
 	/**
 	 * Constructor
 	 */
@@ -45,18 +43,18 @@ public class ConnectorManager implements IConnectorManager {
 		IExtensionRegistry reg = Platform.getExtensionRegistry();
 		IConfigurationElement[] extensions = reg.getConfigurationElementsFor(Activator.PLUGIN_ID, "connectorCore");
 		for(IConfigurationElement iConfigurationElement : extensions) {
-				String name = iConfigurationElement.getAttribute("name");
-				String id = iConfigurationElement.getAttribute("id");
-				String icon = iConfigurationElement.getAttribute("icon");
-				ImageDescriptor imageDescriptor = null;
-				if (icon != null && ! icon.isEmpty()){
-					imageDescriptor = AbstractUIPlugin.imageDescriptorFromPlugin(iConfigurationElement.getNamespaceIdentifier(), icon);
-				}
-			ConnectorDescriptor repositoryConnectorDescriptor = new ConnectorDescriptor(iConfigurationElement, name, id, imageDescriptor);
-				ZigguratInject.inject(repositoryConnectorDescriptor);
-				addConnector(repositoryConnectorDescriptor, id);
-				}
+			String name = iConfigurationElement.getAttribute("name");
+			String id = iConfigurationElement.getAttribute("id");
+			String icon = iConfigurationElement.getAttribute("icon");
+			ImageDescriptor imageDescriptor = null;
+			if(icon != null && !icon.isEmpty()) {
+				imageDescriptor = AbstractUIPlugin.imageDescriptorFromPlugin(iConfigurationElement.getNamespaceIdentifier(), icon);
 			}
+			ConnectorDescriptor repositoryConnectorDescriptor = new ConnectorDescriptor(iConfigurationElement, name, id, imageDescriptor);
+			ZigguratInject.inject(repositoryConnectorDescriptor);
+			addConnector(repositoryConnectorDescriptor, id);
+		}
+	}
 
 	/**
 	 * Adds a connector descriptor
@@ -70,6 +68,7 @@ public class ConnectorManager implements IConnectorManager {
 		}
 	}
 
+	@Override
 	public Collection<ConnectorDescriptor> getAllConnectors() {
 		return connectors.values();
 	}
@@ -78,5 +77,5 @@ public class ConnectorManager implements IConnectorManager {
 	public ConnectorDescriptor get(String connectorId) {
 		return connectors.get(connectorId);
 	}
-	
+
 }

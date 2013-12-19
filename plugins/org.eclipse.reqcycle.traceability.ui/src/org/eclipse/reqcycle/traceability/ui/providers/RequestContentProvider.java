@@ -239,7 +239,7 @@ public class RequestContentProvider extends DeferredContentProvider implements
 					Request r = new Request()
 							.addProperty(
 									IBuildingTraceabilityEngine.OPTION_CHECK_CACHE,
-									false)
+									true)
 
 							.setDepth(DEPTH.ONE)
 							.setDirection(baseRequest.getDirection())

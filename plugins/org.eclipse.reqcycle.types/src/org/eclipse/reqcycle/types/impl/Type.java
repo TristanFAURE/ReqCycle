@@ -12,6 +12,7 @@ import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.reqcycle.types.ICachedTypedChecker;
 import org.eclipse.reqcycle.types.IInjectedTypeChecker;
 import org.eclipse.reqcycle.types.IInjectedTypeChecker.InjectValue;
+import org.eclipse.reqcycle.types.IInjectedTypeChecker.InjectValueName;
 import org.eclipse.reqcycle.types.IType;
 import org.eclipse.reqcycle.types.ITypeChecker;
 import org.eclipse.reqcycle.uri.model.Reachable;
@@ -118,7 +119,12 @@ public class Type implements IType {
 	public List<FieldDescriptor> getDescriptors() {
 		List<FieldDescriptor> descriptors = new LinkedList<FieldDescriptor>();
 		for (Field f : getFieldsToInject()) {
-			descriptors.add(new FieldDescriptor(f.getName(), f.getType()));
+			if(f.isAnnotationPresent(InjectValueName.class)) {
+				InjectValueName annotation = f.getAnnotation(InjectValueName.class);
+				descriptors.add(new FieldURIDescriptor(f.getName(), f.getType(), annotation.type()));
+			} else {
+				descriptors.add(new FieldDescriptor(f.getName(), f.getType()));
+			}
 		}
 		return descriptors;
 	}
@@ -129,7 +135,7 @@ public class Type implements IType {
 		if (IInjectedTypeChecker.class.isAssignableFrom(current)) {
 			while (current != null) {
 				for (Field f : current.getDeclaredFields()) {
-					if (f.isAnnotationPresent(InjectValue.class)) {
+					if (f.isAnnotationPresent(InjectValue.class) || f.isAnnotationPresent(InjectValueName.class)) {
 						fields.add(f);
 					}
 				}
@@ -148,7 +154,7 @@ public class Type implements IType {
 	public Class<? extends ITypeChecker> getCheckerClass() {
 		return checker;
 	}
-
+	
 	// public static class InjectedType extends Type implements IInjectedType {
 	// @Override
 	// public boolean is(Reachable reachable, IValueInjecter injecter) {

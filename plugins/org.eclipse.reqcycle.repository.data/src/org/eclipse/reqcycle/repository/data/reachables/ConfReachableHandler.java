@@ -8,15 +8,14 @@ import org.eclipse.reqcycle.uri.model.Reachable;
 
 public class ConfReachableHandler extends EMFURIHandler {
 
-	 @Override
-    public boolean handlesURI(URI uri)
-    {
-        return super.handlesURI(uri) && uri.path().endsWith("emfconf");
-    }
-	 
-	 @Override
-		protected EMFReachableObject doGetReachableObject(Reachable t) {
-			return new ConfReachableObject(t);
-		}
+	@Override
+	public boolean handlesURI(URI uri) {
+		return super.handlesURI(uri) && (uri.path().endsWith("emfconf") || uri.path().endsWith("reqcycle"));
+	}
+
+	@Override
+	protected EMFReachableObject doGetReachableObject(Reachable t) {
+		return new ConfReachableObject(t);
+	}
 
 }

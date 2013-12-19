@@ -152,9 +152,24 @@ public class NewAttributeDialog extends TitleAreaDialog {
 				true, true, 2, 1));
 		registeredComposite.setEditable(false);
 		setNewOne();
+		
+		recursiveSetEnabled(container, false);
+		
 		return container;
 	}
 
+	public void recursiveSetEnabled(Control ctrl, boolean enabled) {
+		   if (ctrl instanceof Composite) {
+		      Composite comp = (Composite) ctrl;
+		      for (Control c : comp.getChildren()) {
+		         recursiveSetEnabled(c, enabled);
+		         c.setEnabled(enabled);
+		      }
+		   } else {
+		      ctrl.setEnabled(enabled);
+		   }
+		}
+	
 	/**
 	 * Create contents of the button bar.
 	 * 
@@ -162,8 +177,9 @@ public class NewAttributeDialog extends TitleAreaDialog {
 	 */
 	@Override
 	protected void createButtonsForButtonBar(Composite parent) {
-		createButton(parent, IDialogConstants.OK_ID, IDialogConstants.OK_LABEL,
+		Button okButton = createButton(parent, IDialogConstants.OK_ID, IDialogConstants.OK_LABEL,
 				true);
+		okButton.setEnabled(false);
 		createButton(parent, IDialogConstants.CANCEL_ID,
 				IDialogConstants.CANCEL_LABEL, false);
 	}

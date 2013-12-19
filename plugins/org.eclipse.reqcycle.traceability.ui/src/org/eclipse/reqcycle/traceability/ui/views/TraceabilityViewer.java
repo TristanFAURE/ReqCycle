@@ -518,7 +518,7 @@ public class TraceabilityViewer extends ViewPart implements ISelectionListener {
 					.setDepth(DEPTH.ONE)
 					.addProperty(
 							IBuildingTraceabilityEngine.OPTION_CHECK_CACHE,
-							false)
+							true)
 					.addProperty(RequestContentProvider.CONF_KEY,
 							btnFilterOnCurrent.getSelection());
 			if (target == null) {

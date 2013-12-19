@@ -18,11 +18,13 @@ import java.util.Map;
 import org.eclipse.core.resources.IResourceStatus;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.emf.common.util.EList;
 import org.eclipse.emf.common.util.URI;
 import org.eclipse.emf.common.util.WrappedException;
+import org.eclipse.emf.ecore.EDataType;
 import org.eclipse.emf.ecore.EObject;
 import org.eclipse.emf.ecore.EOperation;
 import org.eclipse.emf.ecore.resource.ResourceSet;
@@ -36,9 +38,8 @@ import org.eclipse.ocl.examples.xtext.completeocl.completeOCLCST.ContextDeclCS;
 import org.eclipse.ocl.examples.xtext.completeocl.completeOCLCST.DefCS;
 import org.eclipse.ocl.examples.xtext.completeocl.completeOCLCST.DefOperationCS;
 import org.eclipse.reqcycle.ocl.ReqcycleOCLPlugin;
-import org.eclipse.reqcycle.repository.data.types.DataType;
-import org.eclipse.reqcycle.repository.data.types.RequirementType;
-import org.eclipse.reqcycle.repository.data.types.RequirementTypeAttribute;
+import org.eclipse.reqcycle.repository.data.types.IAttribute;
+import org.eclipse.reqcycle.repository.data.types.IRequirementType;
 import org.eclipse.ziggurat.ocl.OCLEvaluator;
 
 import com.google.common.base.Predicate;
@@ -104,7 +105,7 @@ public class OCLUtilities {
 	 * be associated to a given data type. The operation should be named "isX" where "X" is the name
 	 * of the data type.
 	 */
-	public static IStatus isOperationPresent(final DataType type, BaseResource resource) {
+	public static IStatus isOperationPresent(final IRequirementType type, BaseResource resource) {
 		if(Iterables.size(getMatchingOperations(type, resource)) > 0) {
 			return Status.OK_STATUS;
 		};
@@ -116,8 +117,8 @@ public class OCLUtilities {
 	 * of a given data type. The operation should be named "isX" where "X" is the name
 	 * of the data type.
 	 */
-	public static IStatus isOperationPresent(final RequirementTypeAttribute attribute, BaseResource resource) {
-		String attributeTypeName = attribute.getType().getName();
+	public static IStatus isOperationPresent(final IAttribute attribute, BaseResource resource) {
+		String attributeTypeName = attribute.getName();
 		if(ecoreToOCLPrimitiveTypes.get(attributeTypeName) == null) {
 			return new Status(IStatus.WARNING, ReqcycleOCLPlugin.PLUGIN_ID, "Type " + attributeTypeName + " cannot be used in OCL.");
 		}
@@ -131,7 +132,7 @@ public class OCLUtilities {
 	 * Gets operations that could be used to match uml elements to a data type. These operations
 	 * must have a specific name and signature (no parameter, return boolean).
 	 */
-	public static Iterable<DefOperationCS> getMatchingOperations(final DataType type, BaseResource resource) {
+	public static Iterable<DefOperationCS> getMatchingOperations(final IRequirementType type, BaseResource resource) {
 		Collection<DefOperationCS> operations = getOperations(resource);
 		if(operations == null || Iterables.isEmpty(operations)) {
 			return Collections.emptyList();
@@ -159,7 +160,7 @@ public class OCLUtilities {
 	 * Gets operations that could be used to match uml elements to a data type. These operations
 	 * must have a specific name and signature (no parameter, return boolean).
 	 */
-	public static Iterable<DefOperationCS> getMatchingOperations(final RequirementTypeAttribute attribute, BaseResource resource) {
+	public static Iterable<DefOperationCS> getMatchingOperations(final IAttribute attribute, BaseResource resource) {
 		Collection<DefOperationCS> operations = getOperations(resource);
 		if(operations == null || Iterables.isEmpty(operations)) {
 			return Collections.emptyList();
@@ -174,7 +175,7 @@ public class OCLUtilities {
 				}
 				if(operationReturnType instanceof PrimitiveTypeRefCS) {
 					String returnType = ((PrimitiveTypeRefCS)operationReturnType).getName();
-					String attributeTypeName = attribute.getType().getName();
+					String attributeTypeName = attribute.getName();
 					String lookupResult = ecoreToOCLPrimitiveTypes.get(attributeTypeName);
 					if(lookupResult == null || !lookupResult.equals(returnType)) {
 						return false;
@@ -185,31 +186,31 @@ public class OCLUtilities {
 		});
 	}
 
-	public static String getOperationRequiredName(DataType type) {
+	public static String getOperationRequiredName(IRequirementType type) {
 		StringBuilder builder = new StringBuilder("is"); //$NON-NLS-1$
 		String dataTypeName = type.getName();
 		builder.append(Character.toUpperCase(dataTypeName.charAt(0))).append(dataTypeName.substring(1));
 		return builder.toString();
 	}
 
-	public static String getOperationRequiredName(RequirementTypeAttribute attribute) {
+	public static String getOperationRequiredName(IAttribute attribute) {
 		StringBuilder builder = new StringBuilder("get"); //$NON-NLS-1$
 		String dataTypeName = attribute.getName();
 		builder.append(Character.toUpperCase(dataTypeName.charAt(0))).append(dataTypeName.substring(1));
 		return builder.toString();
 	}
 
-	public static String getOperationRequiredSignature(DataType type) {
+	public static String getOperationRequiredSignature(IRequirementType type) {
 		return getOperationRequiredName(type) + "() : Boolean"; //$NON-NLS-1$
 	}
 
-	public static String getOperationRequiredSignature(RequirementTypeAttribute attribute) {
-		String returnTypeName = attribute.getType().getName();
+	public static String getOperationRequiredSignature(IAttribute attribute) {
+		String returnTypeName = attribute.getName();
 		String lookupType = ecoreToOCLPrimitiveTypes.get(returnTypeName);
 		return getOperationRequiredName(attribute) + "() : " + lookupType; //$NON-NLS-1$
 	}
 
-	public static boolean isDataType(OCLEvaluator evaluator, EObject eObject, RequirementType type) {
+	public static boolean isDataType(OCLEvaluator evaluator, EObject eObject, IRequirementType type) {
 		String operationName = OCLUtilities.getOperationRequiredName(type);
 		EOperation eOperation = evaluator.getCompiledOperation(operationName, eObject);
 		if(eOperation != null) {
@@ -221,16 +222,23 @@ public class OCLUtilities {
 		return false;
 	}
 
-	public static Object getAttributeValue(OCLEvaluator evaluator, EObject eObject, RequirementTypeAttribute attribute) {
+	public static Object getAttributeValue(OCLEvaluator evaluator, EObject eObject, IAttribute attribute) {
 		String operationName = OCLUtilities.getOperationRequiredName(attribute);
 		EOperation eOperation = evaluator.getCompiledOperation(operationName, eObject);
 		if(eOperation != null) {
 			Object result = evaluator.evaluateOperation(eOperation, eObject, new Object[0]);
-			if(attribute.getType().isInstance(result)) {
+			
+			EDataType type = getDataType(attribute);
+			
+			if(type == null) {
+				return null;
+			}
+			
+			if(type.isInstance(result)) {
 				return result;
 			} else {
 				Object converted = convertResult(result, attribute);
-				if(attribute.getType().isInstance(converted)) {
+				if(type.isInstance(converted)) {
 					return converted;
 				}
 			}
@@ -238,8 +246,23 @@ public class OCLUtilities {
 		return null;
 	}
 
-	protected static Object convertResult(Object result, RequirementTypeAttribute attribute) {
-		String instanceClass = attribute.getType().getInstanceClassName();
+	private static EDataType getDataType(IAttribute attribute) {
+		EDataType type = null;
+		
+		if(attribute instanceof IAdaptable) {
+			type = (EDataType)((IAdaptable)attribute).getAdapter(EDataType.class);
+		}
+		return type;
+	}
+
+	protected static Object convertResult(Object result, IAttribute attribute) {
+		EDataType type = getDataType(attribute);
+		
+		if(type == null) {
+			return null;
+		}
+		
+		String instanceClass = type.getInstanceClassName();
 		if("float".equalsIgnoreCase(instanceClass) && result instanceof Double) { //$NON-NLS-1$
 			return ((Double)result).floatValue();
 		}

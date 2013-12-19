@@ -1,13 +1,117 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <?eclipse version="3.4"?>
 <plugin>
-   <extension
+   	<extension
          point="org.eclipse.reqcycle.repository.connector.connectorCore">
       <connectorCore
             class="org.eclipse.reqcycle.repository.connector.local.LocalConnector"
             id="org.eclipse.reqcycle.repository.connector.local.connectorCore"
             name="Local">
       </connectorCore>
+   	</extension>
+<!--<extension
+         point="org.eclipse.ui.menus">
+		<menuContribution
+	            locationURI="popup:org.eclipse.reqcycle.repository.presentation.DataModelEditorID?before=edit">
+	         <menu
+	         		id="org.eclipse.reqcycle.repository.connector.local.create.menu"
+	               label="New Child">
+	               <dynamic
+	               		class="org.eclipse.reqcycle.repository.connector.local.ReqCycleContributionItem"
+	                     id="org.eclipse.reqcycle.repository.connector.local.create.menu.widget">
+	               </dynamic>
+	         </menu>
+	      </menuContribution>
+	</extension>-->
+
+      <extension
+         point="org.eclipse.ui.menus">
+      <menuContribution
+            locationURI="popup:org.eclipse.ui.popup.any?after=new.ext">
+         <command
+               commandId="org.eclipse.reqcycle.repository.connector.local.editRequirements.command"
+               id="org.eclipse.reqcycle.repository.connector.local.editRequirements"
+               label="Edit Requirements"
+               style="push">
+               <visibleWhen>
+                  <with  variable="selection">
+                     <test
+                           property="org.eclipse.reqcycle.repository.connector.local.editRequirement.tester.isLocal">
+                     </test>
+                            
+                  </with>
+               </visibleWhen>
+         </command>
+      </menuContribution>
+      <menuContribution
+            locationURI="popup:org.eclipse.ui.navigator.ProjectExplorer#PopupMenu?after=additions">
+         <command
+               commandId="org.eclipse.reqcycle.repository.connector.local.useSource"
+               id="org.eclipse.reqcycle.repository.connector.local.useSource"
+               label="Use as Requirement Source"
+               style="push">
+         </command>
+      </menuContribution>
+   </extension>
+   <extension
+         point="org.eclipse.ui.commands">
+      <command
+            id="org.eclipse.reqcycle.repository.connector.local.editRequirements.command"
+            name="Edit Requirements Command">
+      </command>
+      <command
+            id="org.eclipse.reqcycle.repository.connector.local.useSource"
+            name="Use as Requirement Source">
+      </command>
+   </extension>
+   <extension
+         point="org.eclipse.ui.handlers">
+      <handler
+            class="org.eclipse.reqcycle.repository.connector.local.EditRequirementsHandler"
+            commandId="org.eclipse.reqcycle.repository.connector.local.editRequirements.command">
+      </handler>
+      <handler
+            class="org.eclipse.reqcycle.repository.connector.local.UseAsSourceHandler"
+            commandId="org.eclipse.reqcycle.repository.connector.local.useSource">
+      </handler>
+   </extension>
+   <extension
+         point="org.eclipse.core.expressions.propertyTesters">
+      <propertyTester
+            class="org.eclipse.reqcycle.repository.connector.local.EditRequirementsPropertyTester"
+            id="org.eclipse.reqcycle.repository.connector.local.editRequirements.PropertyTester"
+            namespace="org.eclipse.reqcycle.repository.connector.local.editRequirement.tester"
+            properties="isLocal"
+            type="org.eclipse.jface.viewers.IStructuredSelection">
+      </propertyTester>
+   </extension>
+   
+   
+   <extension point="org.eclipse.ui.newWizards">
+      <!-- @generated not RequirementSourceData -->
+<!--      <category
+            id="org.eclipse.emf.ecore.Wizard.category.ID"
+            name="%_UI_Wizard_category"/>
+      <wizard
+            id="RequirementSourceData.presentation.RequirementSourceDataModelWizardID"
+            name="%_UI_RequirementSourceDataModelWizard_label"
+            class="RequirementSourceData.presentation.RequirementSourceDataModelWizard"
+            category="org.eclipse.emf.ecore.Wizard.category.ID"
+            icon="icons/full/obj16/RequirementSourceDataModelFile.gif">
+         <description>%_UI_RequirementSourceDataModelWizard_description</description>
+         <selection class="org.eclipse.core.resources.IResource"/>
+      </wizard> -->
    </extension>
 
+   <extension point="org.eclipse.ui.editors">
+      <!-- @generated not RequirementSourceData -->
+      <editor
+            id="RequirementSourceData.presentation.RequirementSourceDataEditorID"
+            name="%_UI_RequirementSourceDataEditor_label"
+            icon="icons/full/obj16/RequirementSourceDataModelFile.gif"
+            extensions="requirementsourcedata"
+            class="org.eclipse.reqcycle.repository.connector.local.ui.editor.CustomDataModelEditor"
+            contributorClass="org.eclipse.reqcycle.repository.connector.local.ui.editor.CustomDataModelActionBarContributor">
+      </editor>
+   </extension>
 </plugin>

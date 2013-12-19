@@ -5,11 +5,12 @@ import javax.inject.Inject;
 
 import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.dialogs.TitleAreaDialog;
-import org.eclipse.reqcycle.traceability.types.configuration.preferences.validators.RegexPredicate;
 import org.eclipse.reqcycle.traceability.types.configuration.typeconfiguration.CustomType;
 import org.eclipse.reqcycle.traceability.types.configuration.typeconfiguration.Entry;
 import org.eclipse.reqcycle.traceability.types.configuration.typeconfiguration.Type;
 import org.eclipse.reqcycle.traceability.types.configuration.typeconfiguration.TypeconfigurationFactory;
+import org.eclipse.reqcycle.traceability.types.ui.ExtensionPointReader;
+import org.eclipse.reqcycle.traceability.types.ui.IEntryCompositeProvider;
 import org.eclipse.reqcycle.types.IType;
 import org.eclipse.reqcycle.types.IType.FieldDescriptor;
 import org.eclipse.reqcycle.types.ITypesManager;
@@ -22,25 +23,19 @@ import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
-import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
-import org.eclipse.swt.widgets.Widget;
-
-import com.google.common.base.Predicate;
-import com.google.common.base.Predicates;
 
 public class NewCustomTypeDialog extends TitleAreaDialog {
 
-	private static final String AN_ENTRY = "entry";
-	private static final String A_PREDICATE = "predicate";
 	private CustomType newCustomType;
 	private Text textName;
 	@Inject
 	ITypesManager manager;
 	private IType injectedJavaType;
+	ExtensionPointReader epr = new ExtensionPointReader();
 
 	/**
 	 * Create the dialog.
@@ -50,6 +45,7 @@ public class NewCustomTypeDialog extends TitleAreaDialog {
 	 */
 	public NewCustomTypeDialog(Shell parentShell, Type injected) {
 		super(parentShell);
+		setShellStyle(SWT.DIALOG_TRIM | SWT.RESIZE);
 		newCustomType = TypeconfigurationFactory.eINSTANCE.createCustomType();
 		newCustomType.setSuperType(injected);
 	}
@@ -106,6 +102,7 @@ public class NewCustomTypeDialog extends TitleAreaDialog {
 
 		Composite composite = new Composite(scrolledComposite, SWT.NONE);
 		composite.setLayout(new GridLayout(2, false));
+		composite.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
 
 		createEntries(composite);
 
@@ -117,69 +114,23 @@ public class NewCustomTypeDialog extends TitleAreaDialog {
 	}
 
 	private void createEntries(Composite composite) {
-		for (FieldDescriptor d : injectedJavaType.getDescriptors()) {
-			createEntry(composite, d);
-		}
-
-	}
-
-	private void createEntry(Composite composite, FieldDescriptor d) {
-		Label lblNewLabel = new Label(composite, SWT.NONE);
-		lblNewLabel.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER, false,
-				false, 1, 1));
-		lblNewLabel.setText(getName(d) + " :");
-		Text text_1 = new Text(composite, SWT.BORDER);
-		text_1.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1,
-				1));
-		final Predicate<String> predicate = getPredicate(d.type);
-		Entry entry = TypeconfigurationFactory.eINSTANCE.createEntry();
-		entry.setName(d.name);
-		newCustomType.getEntries().add(entry);
-		text_1.setData(AN_ENTRY, entry);
-		text_1.setData(A_PREDICATE, predicate);
-		text_1.addModifyListener(new ModifyListener() {
-
-			@Override
-			public void modifyText(ModifyEvent e) {
-				Widget w = e.widget;
-				if (w instanceof Text) {
-					Text text = (Text) w;
-					text.setBackground(Display.getDefault().getSystemColor(
-							SWT.COLOR_WHITE));
-					Predicate<String> p = (Predicate<String>) text
-							.getData(A_PREDICATE);
-					Entry currentEntry = (Entry) text.getData(AN_ENTRY);
-					String value = text.getText();
-					if (value.length() != 0) {
-						if (!p.apply(value)) {
-							text.setBackground(Display.getDefault()
-									.getSystemColor(SWT.COLOR_RED));
-						} else {
-							currentEntry.setValue(value);
-						}
-					} else {
-						currentEntry.setValue(null);
-					}
-				}
+		for (IType.FieldDescriptor d : injectedJavaType.getDescriptors()) {
+			IEntryCompositeProvider entryProvider = epr.getEntryCompositeProvider(d);
+			if(entryProvider != null) {
+				createLabel(composite, d);
+				Entry entry = entryProvider.createEntryComposite(composite, SWT.NONE, d);
+				newCustomType.getEntries().add(entry);
 			}
-		});
-	}
-
-	private Predicate<String> getPredicate(Class<?> type) {
-		if (String.class.isAssignableFrom(type)) {
-			return Predicates.alwaysTrue();
-		} else if ((Boolean.class.isAssignableFrom(type))
-				|| (boolean.class.isAssignableFrom(type))) {
-			return new RegexPredicate("true|false");
-		} else if ((Integer.class.isAssignableFrom(type))
-				|| int.class.isAssignableFrom(type)) {
-			return new RegexPredicate("\\d*");
-		} else {
-			return Predicates.alwaysFalse();
 		}
 	}
 
-	protected String getName(FieldDescriptor d) {
+	private void createLabel(Composite composite, FieldDescriptor d) {
+		Label lblNewLabel = new Label(composite, SWT.NONE);
+		lblNewLabel.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER, false, false, 1, 1));
+		lblNewLabel.setText(getName(d) + " :");
+	}
+
+	protected String getName(IType.FieldDescriptor d) {
 		StringBuilder builder = new StringBuilder();
 		char[] inChar = d.name.toCharArray();
 		String currentWord = "";
@@ -195,7 +146,7 @@ public class NewCustomTypeDialog extends TitleAreaDialog {
 		builder.append(currentWord);
 		return builder.toString();
 	}
-
+	
 	@Override
 	protected void buttonPressed(int buttonId) {
 		super.buttonPressed(buttonId);

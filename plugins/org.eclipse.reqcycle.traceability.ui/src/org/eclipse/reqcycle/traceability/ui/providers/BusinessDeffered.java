@@ -1,13 +1,18 @@
 package org.eclipse.reqcycle.traceability.ui.providers;
 
 import java.util.Collection;
+import java.util.concurrent.Callable;
 
 import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.jobs.ISchedulingRule;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.reqcycle.traceability.model.Link;
-import org.eclipse.reqcycle.traceability.ui.views.LinkPropertySource;
+import org.eclipse.reqcycle.traceability.ui.LinkPropertySource;
+import org.eclipse.reqcycle.traceability.ui.views.TraceabilityViewer;
+import org.eclipse.ui.IViewReference;
+import org.eclipse.ui.IWorkbenchPart;
+import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.progress.IDeferredWorkbenchAdapter;
 import org.eclipse.ui.progress.IElementCollector;
 import org.eclipse.ui.views.properties.IPropertySource;
@@ -111,7 +116,22 @@ public class BusinessDeffered implements IDeferredWorkbenchAdapter, IAdaptable {
 	public Object getAdapter(Class adapter) {
 		if (getBusinessElement() instanceof Link) {
 			if (adapter == IPropertySource.class) {
-				return new LinkPropertySource((Link) getBusinessElement(), this);
+				Callable<?> callback = new Callable<Object>(){
+					@Override
+					public Object call() throws Exception {
+						for(IViewReference vr : PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage().getViewReferences()) {
+							if(vr.getId().equals(TraceabilityViewer.ID)) {
+								IWorkbenchPart part = vr.getPart(false);
+								if(part != null && PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage().isPartVisible(part)) {
+									TraceabilityViewer v = (TraceabilityViewer)part;
+									v.refreshElement(BusinessDeffered.this);
+								}
+							}
+						}
+						return null;
+					}
+				};
+				return new LinkPropertySource((Link) getBusinessElement(), callback);
 			}
 		}
 		return null;

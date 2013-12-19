@@ -11,6 +11,7 @@
 package org.eclipse.ziggurat.configuration;
 
 import java.io.IOException;
+import java.util.Collection;
 import java.util.Map;
 
 import org.eclipse.core.resources.IResource;
@@ -48,7 +49,7 @@ public interface IConfigurationManager {
 	 * @param id
 	 * @return the configuration or null if not found
 	 */
-	EObject getConfiguration(IResource context, Scope scope, String id, boolean reload);
+	Collection<EObject> getConfiguration(IResource context, Scope scope, String id, boolean reload);
 
 	/**
 	 * Retrieve a configuration EObject using the provided resource set to load the corresponding configuration resource.
@@ -62,7 +63,7 @@ public interface IConfigurationManager {
 	 * @param resourceSet
 	 * @return the configuration or null if not found
 	 */
-	EObject getConfiguration(IResource context, Scope scope, String id, ResourceSet resourceSet, boolean reload);
+	Collection<EObject> getConfiguration(IResource context, Scope scope, String id, ResourceSet resourceSet, boolean reload);
 
 	/**
 	 * Save an EObject as a configuration.
@@ -81,6 +82,23 @@ public interface IConfigurationManager {
 	 */
 	void saveConfiguration(EObject conf, IResource context, Scope scope, String id, ResourceSet resourceSet) throws IOException;
 
+	/**
+	 * Save a Collection of EObjects as a configuration.
+	 * Objects can have references to elements outside themselves in the provided resource set,
+	 * but it implies that the configuration will be saved and loaded using a configuration Resource in the provided resource set.
+	 * You can use getConfigurationResourceExtension to filter configuration resources when displaying your resource set.
+	 * 
+	 * @param conf
+	 * @param context
+	 *        can be null if the scope is workspace
+	 * @param scope
+	 *        should not be null
+	 * @param id
+	 * @param resourceSet
+	 * @throws IOException
+	 */
+	void saveConfiguration(Collection<? extends EObject> conf, IResource context, Scope scope, String id, ResourceSet resourceSet) throws IOException;
+	
 	/**
 	 * Save an EObject as a configuration.
 	 * The object should be self contained (no references outside of itself or its children),

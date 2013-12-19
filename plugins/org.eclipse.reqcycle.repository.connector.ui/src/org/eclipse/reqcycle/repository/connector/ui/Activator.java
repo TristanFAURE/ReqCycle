@@ -11,7 +11,7 @@ public class Activator extends AbstractUIPlugin {
 
 	// The plug-in ID
 	public static final String PLUGIN_ID = "org.eclipse.reqcycle.repository.connector.ui"; //$NON-NLS-1$
-	
+
 	public static final String OPTIONS_DEBUG = PLUGIN_ID + "/debug";
 
 	// The shared instance
@@ -62,5 +62,5 @@ public class Activator extends AbstractUIPlugin {
 	public static ImageDescriptor getImageDescriptor(String path) {
 		return imageDescriptorFromPlugin(PLUGIN_ID, path);
 	}
-	
+
 }

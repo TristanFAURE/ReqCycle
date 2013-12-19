@@ -18,7 +18,19 @@ Require-Bundle: org.eclipse.ui,
  org.eclipse.reqcycle.predicates.ui;bundle-version="1.0.0",
  org.eclipse.reqcycle.ui.components;bundle-version="1.0.0",
  org.eclipse.core.commands,
- org.eclipse.ui.workbench
+ org.eclipse.ui.workbench,
+ org.eclipse.jface.text,
+ org.eclipse.ui.editors,
+ org.eclipse.e4.ui.di,
+ org.eclipse.team.core;bundle-version="3.7.0",
+ org.eclipse.ui.forms,
+ org.eclipse.core.databinding,
+ org.eclipse.core.databinding.beans,
+ org.eclipse.core.databinding.observable,
+ org.eclipse.core.databinding.property,
+ org.eclipse.jface.databinding,
+ com.ibm.icu,
+ org.eclipse.emf.workspace;bundle-version="1.5.1"
 Bundle-ActivationPolicy: lazy
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Import-Package: javax.annotation;version="1.0.0",

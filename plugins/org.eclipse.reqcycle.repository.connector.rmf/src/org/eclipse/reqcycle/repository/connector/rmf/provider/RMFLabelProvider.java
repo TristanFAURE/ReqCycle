@@ -21,20 +21,17 @@ import org.eclipse.swt.graphics.Image;
 /**
  * Connector Label Provider
  */
-public class RMFLabelProvider extends LabelProvider
-{
-	
-    public String getText(Object obj)
-    {
-    	if(obj instanceof SpecType) {
+public class RMFLabelProvider extends LabelProvider {
+
+	public String getText(Object obj) {
+		if(obj instanceof SpecType) {
 			return ((SpecType)obj).getLongName();
 		}
-    	
-        return obj.toString();
-    }
 
-    public Image getImage(Object obj)
-    {
-        return null;
-    }
+		return obj.toString();
+	}
+
+	public Image getImage(Object obj) {
+		return null;
+	}
 }

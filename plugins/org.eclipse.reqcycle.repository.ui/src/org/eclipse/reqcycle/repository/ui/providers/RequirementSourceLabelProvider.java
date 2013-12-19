@@ -29,7 +29,7 @@ import org.eclipse.reqcycle.repository.ui.Messages;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.ziggurat.inject.ZigguratInject;
 
-import DataModel.RequirementSource;
+import RequirementSourceConf.RequirementSource;
 
 public class RequirementSourceLabelProvider extends LabelProvider {
 
@@ -42,15 +42,18 @@ public class RequirementSourceLabelProvider extends LabelProvider {
 	/** Repository icon */
 	protected static final String ICONS_STATUS_UNSYNCHRONIZED = Messages.YELLOW_STATUS_ICON;
 
-
 	private @Inject
 	IConnectorManager repositoryConnectorManager = ZigguratInject.make(IConnectorManager.class);
 
-
+	@Override
 	public String getText(Object obj) {
 		if(obj instanceof String) {
 			ConnectorDescriptor connectorDescriptor = repositoryConnectorManager.get((String)obj);
-			return connectorDescriptor.getName();
+			if(connectorDescriptor != null) {
+				return connectorDescriptor.getName();
+			} else {
+				return "";
+			}
 		}
 		if(obj instanceof RequirementSource) {
 			return DataUtil.getLabel(obj);
@@ -58,11 +61,16 @@ public class RequirementSourceLabelProvider extends LabelProvider {
 		return obj.toString();
 	}
 
+	@Override
 	public Image getImage(Object obj) {
 
 		if(obj instanceof String) {
 			ConnectorDescriptor connectorDescriptor = repositoryConnectorManager.get((String)obj);
-			return ConnectorLabelProvider.createImage(connectorDescriptor, 16, 16);
+			if(connectorDescriptor != null) {
+				return ConnectorLabelProvider.createImage(connectorDescriptor, 16, 16);
+			} else {
+				return null;
+			}
 		}
 
 		return Activator.getImageDescriptor(ICONS_STATUS_OFFLINE).createImage();

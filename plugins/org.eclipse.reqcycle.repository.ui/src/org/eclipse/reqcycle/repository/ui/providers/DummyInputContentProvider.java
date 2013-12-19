@@ -11,10 +11,10 @@ import org.eclipse.emf.edit.ui.provider.AdapterFactoryContentProvider;
 import org.eclipse.jface.viewers.ArrayContentProvider;
 import org.eclipse.reqcycle.predicates.core.api.IPredicate;
 
-import DataModel.Contained;
-import DataModel.Requirement;
-import DataModel.RequirementSource;
-import DataModel.Section;
+import RequirementSourceConf.RequirementSource;
+import RequirementSourceData.AbstractElement;
+import RequirementSourceData.Section;
+import RequirementSourceData.SimpleRequirement;
 
 import com.google.common.base.Function;
 import com.google.common.base.Predicates;
@@ -46,6 +46,7 @@ public class DummyInputContentProvider extends AdapterFactoryContentProvider {
 		if(object instanceof DummyInput) {
 			Object[] children = Collections2.transform(((DummyInput)object).getInput(), new Function<RequirementSource, DummyObject>() {
 
+				@Override
 				public DummyObject apply(RequirementSource reqSource) {
 					return new DummyObject(((DummyInput)object).getPredicate(), reqSource);
 				};
@@ -55,7 +56,7 @@ public class DummyInputContentProvider extends AdapterFactoryContentProvider {
 		if(object instanceof DummyObject) {
 			final DummyObject dummyObject = (DummyObject)object;
 			EObject obj = dummyObject.getEobj();
-			Collection<Contained> elements = Collections.emptyList();
+			Collection<AbstractElement> elements = Collections.emptyList();
 			if(obj instanceof RequirementSource) {
 				elements = ((RequirementSource)obj).getRequirements();
 			}
@@ -69,8 +70,10 @@ public class DummyInputContentProvider extends AdapterFactoryContentProvider {
 				public DummyObject apply(EObject eObj) {
 					IPredicate predicate = dummyObject.getPredicate();
 					DummyObject dObj = new DummyObject(predicate, eObj);
-					if(dObj.getEobj() instanceof Section && !(dObj.getEobj() instanceof Requirement)) {
-						return dObj; // do not use predicate filter for sections which are not requirements
+					if(dObj.getEobj() instanceof Section && !(dObj.getEobj() instanceof SimpleRequirement)) {
+						return dObj; // do not use predicate filter for
+										// sections which are not
+										// requirements
 					}
 					if(predicate != null) {
 						return predicate.match(eObj) ? dObj : null;
@@ -101,7 +104,14 @@ public class DummyInputContentProvider extends AdapterFactoryContentProvider {
 		if(object instanceof DummyInput) {
 			return true;
 		} else if(object instanceof DummyObject) {
-			return super.hasChildren(((DummyObject)object).getEobj());
+			EObject eobj = ((DummyObject)object).getEobj();
+			if(eobj instanceof RequirementSource) {
+				return !((RequirementSource)eobj).getRequirements().isEmpty();
+			}
+			if(eobj instanceof Section) {
+				return !((Section)eobj).getChildren().isEmpty();
+			}
+			return false;
 		}
 		return super.hasChildren(object);
 	}

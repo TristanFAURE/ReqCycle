@@ -40,5 +40,6 @@
             decorate="org.eclipse.reqcycle.traceability.types.builder.AttributesConfigurationBuildingDecoration">
       </decoration>
    </extension>
+   
 
 </plugin>

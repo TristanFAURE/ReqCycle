@@ -1,5 +1,9 @@
 package org.eclipse.reqcycle.uri.impl.handlers;
 
+import org.eclipse.core.resources.IFile;
+import org.eclipse.core.resources.IResource;
+import org.eclipse.core.resources.ResourcesPlugin;
+import org.eclipse.core.runtime.Path;
 import org.eclipse.jface.viewers.ILabelProvider;
 import org.eclipse.jface.viewers.LabelProvider;
 import org.eclipse.reqcycle.uri.exceptions.VisitableException;
@@ -32,6 +36,11 @@ public class StandardReachableObject implements ReachableObject {
 
 			};
 		}
+		if (IResource.class.equals(adapter) || IFile.class.equals(adapter)) {
+			Reachable reachable = this.getReachable(this.object);
+			String path = reachable.getPath();
+			return ResourcesPlugin.getWorkspace().getRoot().getFile(new Path(path));
+		}
 		return null;
 	}
 
@@ -47,8 +56,8 @@ public class StandardReachableObject implements ReachableObject {
 
 	@Override
 	public Reachable getReachable(Object o) {
-		if (object instanceof Reachable) {
-			return (Reachable) object;
+		if(object instanceof Reachable) {
+			return (Reachable)object;
 		} else {
 			return StandardUtils.getReachable(o);
 		}

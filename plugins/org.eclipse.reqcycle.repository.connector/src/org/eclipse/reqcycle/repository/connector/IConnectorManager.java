@@ -10,7 +10,7 @@
  * Contributors:
  *  Anass RADOUANI (AtoS) anass.radouani@atos.net - Initial API and implementation
  *
-  *****************************************************************************/
+ *****************************************************************************/
 package org.eclipse.reqcycle.repository.connector;
 
 import java.util.Collection;
@@ -21,6 +21,7 @@ public interface IConnectorManager {
 
 	/**
 	 * Gets all repositories connectors
+	 * 
 	 * @return Collection of repositories connectors
 	 */
 	public Collection<ConnectorDescriptor> getAllConnectors();
@@ -28,10 +29,11 @@ public interface IConnectorManager {
 	/**
 	 * Gets a repository connector by his id
 	 * 
-	 * @param connectorId the connector id
+	 * @param connectorId
+	 *        the connector id
 	 * @return the corresponding connector
 	 */
 	public ConnectorDescriptor get(String connectorId);
 
-	
+
 }

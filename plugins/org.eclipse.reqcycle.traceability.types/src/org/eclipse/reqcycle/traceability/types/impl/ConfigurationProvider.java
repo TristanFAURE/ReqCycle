@@ -1,6 +1,7 @@
 package org.eclipse.reqcycle.traceability.types.impl;
 
 import java.io.IOException;
+import java.util.Collection;
 import java.util.Set;
 
 import javax.annotation.PostConstruct;
@@ -50,12 +51,16 @@ public class ConfigurationProvider implements ITypesConfigurationProvider,
 	}
 
 	private TypeConfigContainer doGetContainer() {
-		TypeConfigContainer configuration = (TypeConfigContainer) confManager
-				.getConfiguration(null, null,
-						ITypesConfigurationProvider.CONF_PREF_ID, false);
-		if (configuration == null) {
-			configuration = TypeconfigurationFactory.eINSTANCE
-					.createTypeConfigContainer();
+
+		Collection<EObject> conf = confManager.getConfiguration(null, null, ITypesConfigurationProvider.CONF_PREF_ID, false);
+
+		TypeConfigContainer configuration = null;
+		if(conf != null && !conf.isEmpty()) {
+			configuration = (TypeConfigContainer)conf.iterator().next();
+		}
+
+		if(configuration == null) {
+			configuration = TypeconfigurationFactory.eINSTANCE.createTypeConfigContainer();
 			saveContainer(configuration);
 		}
 		for (int i = 0; i < configuration.getTypes().size(); i++) {
@@ -175,9 +180,15 @@ public class ConfigurationProvider implements ITypesConfigurationProvider,
 
 	@Override
 	public Iterable<IType> getTypes() {
-		final TypeConfigContainer container = (TypeConfigContainer) confManager
+		Collection<EObject> conf = confManager
 				.getConfiguration(null, null,
 						ITypesConfigurationProvider.CONF_PREF_ID, false);
+		
+		TypeConfigContainer container = null;
+		if(conf != null && !conf.isEmpty()) {
+			container = (TypeConfigContainer) conf.iterator().next();
+		}
+		
 		if (container == null) {
 			return ImmutableList.of();
 		}
